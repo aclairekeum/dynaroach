@@ -33,6 +33,7 @@
 #include "network.h"
 #include "sclock.h"
 #include "ppool.h"
+#include "spi_controller.h"
 #include "cmd.h"
 
 

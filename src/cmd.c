@@ -11,6 +11,8 @@
 #include "network.h"
 #include "utils.h"
 #include "sclock.h"
+#include "gyro.h"
+#include "xl.h"
 #include "statetransition.h"
 #include "led.h"
 #include "adc.h"
