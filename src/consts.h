@@ -14,7 +14,7 @@
 #define STATUS_UNUSED       0
 
 //Communication constants
-#define TX_PAYLOAD_SIZE     128 
+#define TX_PAYLOAD_SIZE     128
 
 //Timer constants
 #define FT1                 100
@@ -29,14 +29,14 @@
 
 
 #define MAX_TEST_FUNC_SIZE  0x10
-#define MAX_CMD_FUNC_SIZE   0x20 
+#define MAX_CMD_FUNC_SIZE   0x20
 
 
 //Testing constants
-#define CMD_TEST_RADIO              0x00 
+#define CMD_TEST_RADIO              0x00
 #define CMD_TEST_GYRO               0x01
 #define CMD_TEST_ACCEL              0x02
-#define CMD_TEST_DFLASH             0x03 
+#define CMD_TEST_DFLASH             0x03
 #define CMD_TEST_MOTOR              0x04
 #define CMD_TEST_SMA                0x05
 #define CMD_TEST_HALL               0x06

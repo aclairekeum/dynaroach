@@ -2,15 +2,15 @@
 * Name: main.c
 * Desc: This is a program for controlling the dynaRoACH robot. Motor commands
 * for the primary power motor as well as the SMA leg actuators can be issued
-* from a laptop and handled here. Sensory data is written to flash memory for 
-* dumping over the wireless link after a run. 
+* from a laptop and handled here. Sensory data is written to flash memory for
+* dumping over the wireless link after a run.
 *
 * The architecture is based on a function pointer queue scheduling model. The
-* meat of the control logic resides in test.c. If the radio has received a 
+* meat of the control logic resides in test.c. If the radio has received a
 * command packet during the previous timer interval for Timer2, the appropriate
-* function pointer is added to a queue in the interrupt service routine for 
+* function pointer is added to a queue in the interrupt service routine for
 * Timer2 (interrupts.c). The main loop simply pops the function pointer off
-* the top of the queue and executes it. 
+* the top of the queue and executes it.
 *
 * Date: 2011-04-13
 * Author: AMH
@@ -41,7 +41,7 @@ void initDma0(void)
     DMA0CONbits.AMODE = 0;                      //Configure DMA for register indirect with post increment
     DMA0CONbits.MODE = 0;                       //Configure DMA for continuous mode (not Ping Pong)
     DMA0PAD = (int)&ADC1BUF0;                   //Peripheral address register: the ADC1 buffer
-    DMA0CNT = 0;                                //Transfer after ever 2 samples 
+    DMA0CNT = 0;                                //Transfer after ever 2 samples
     DMA0REQ = 13;                               //Select ADC1 as DMA request source
     DMA0STA = __builtin_dmaoffset(ADCBuffer);   //DMA RAM start address
 
@@ -99,7 +99,7 @@ int main ( void )
     AD1CON1bits.ADON = 0;       //disable
     AD1CON1bits.SSRC = 0b011;   //Sample clock source based on PWM
     AD1CON1bits.ASAM = 0;       //Auto sampling off
-    AD1CON1bits.SIMSAM = 0;     //Do not sample channels simultaneously 
+    AD1CON1bits.SIMSAM = 0;     //Do not sample channels simultaneously
     AD1CON1bits.ADSIDL = 0;     //continue in idle mode
     AD1CON1bits.AD12B = 0;      //10 bit mode
 
@@ -127,7 +127,7 @@ int main ( void )
     sclockSetup();
     timer1Setup();
     cmdSetup();
-   
+
 
     attSetup(1.0/TIMER1_FCY);
     char j;
@@ -144,7 +144,7 @@ int main ( void )
     LED_1 = 1;
     LED_2 = 1;
     LED_3 = 1;
-   
+
     //radioDeleteQueues();
     while(1){
         cmdHandleRadioRxBuffer();

@@ -49,18 +49,18 @@ static void mcSetupPeripheral(void)
     PWMCON1bits.PMOD1 = 1;
     PWMCON1bits.PMOD2 = 1;
     PWMCON1bits.PMOD3 = 1;
-    
+
     PWMCON1bits.PEN1H = 1;
     PWMCON1bits.PEN2H = 1;
     PWMCON1bits.PEN3H = 1;
     PWMCON1bits.PEN1L = 1;
     PWMCON1bits.PEN2L = 1;
     PWMCON1bits.PEN3L = 1;
-    
+
     PWMCON2bits.SEVOPS = 0; // postscale 1:1
     PWMCON2bits.OSYNC = 0;
     PWMCON2bits.UDIS = 0;
-    
+
     PTCONbits.PTMOD = 0; // Free running mode
     PTCONbits.PTOPS = 0; // postscale 1:1
     PTCONbits.PTCKPS = 0b10; // prescale 1:16
@@ -71,8 +71,8 @@ static void mcSetupPeripheral(void)
     //P1OVDCONbits.POVD1H = 0;
     //P1OVDCONbits.POUT1H = 0;
 
-    P1OVDCONbits.POVD1L = 0; 
-    P1OVDCONbits.POVD1H = 1; 
+    P1OVDCONbits.POVD1L = 0;
+    P1OVDCONbits.POVD1H = 1;
     P1OVDCONbits.POUT1L = 0;
 
 }

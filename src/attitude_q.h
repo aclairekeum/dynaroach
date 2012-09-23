@@ -36,7 +36,7 @@
  * Revisions:
  *  Stanley S. Baek      2010-08-27    Initial release
  *  Humphrey Hu		 2011-07-12    Changed to fixed point
- * 
+ *
  */
 
 #ifndef __ATTITUDE_H

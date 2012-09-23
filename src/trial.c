@@ -26,7 +26,7 @@ void trialConfigure(TrialDescriptor trial, int time, unsigned char duty_cycle, i
     trial->sma_l_off = (long)sma_l_off * 1000;
     trial->sma_r_on = (long)sma_r_on * 1000;
     trial->sma_r_off = (long)sma_r_off * 1000;
-    trial->closed_loop = closed_loop; 
+    trial->closed_loop = closed_loop;
 }
 
 

@@ -17,4 +17,4 @@ typedef TrialDescriptorStruct* TrialDescriptor;
 TrialDescriptor trialCreateConfig(void);
 void trialConfigure(TrialDescriptor trial, int time, unsigned char duty_cycle, int sma_l_on, int sma_l_off, int sma_r_on, int sma_r_off, char closed_loop);
 
-#endif //__TRIAL_H 
+#endif //__TRIAL_H

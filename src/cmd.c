@@ -27,7 +27,7 @@ static union {
         unsigned int page;
         unsigned int byte;
     } index;
-    unsigned char chr_index[4]; 
+    unsigned char chr_index[4];
 } MemLoc;
 
 
@@ -108,13 +108,13 @@ static void cmdSetSma(unsigned char status, unsigned char length, unsigned char 
 {
     if(frame[0] == SMA_RIGHT)
     {
-        P1OVDCONbits.POVD3L = 1; 
-        P1OVDCONbits.POVD3H = 0; 
-        P1OVDCONbits.POUT3H = 0; 
+        P1OVDCONbits.POVD3L = 1;
+        P1OVDCONbits.POVD3H = 0;
+        P1OVDCONbits.POUT3H = 0;
     }else if (frame[0] == SMA_LEFT)
     {
-        P1OVDCONbits.POVD3H = 1; 
-        P1OVDCONbits.POVD3L = 0; 
+        P1OVDCONbits.POVD3H = 1;
+        P1OVDCONbits.POVD3L = 0;
         P1OVDCONbits.POUT3L = 0;
     }
     mcSetDutyCycle(3, frame[1]); //Hardcoded "3" needs to go
@@ -126,7 +126,7 @@ void cmdHandleRadioRxBuffer(void)
     MacPacket packet;
     Payload pld;
     unsigned char command, status;
-    
+
     if((packet = radioDequeueRxPacket()) != NULL)
     {
         pld = macGetPayload(packet);
@@ -223,7 +223,7 @@ static void cmdConfigureSma(unsigned char status, unsigned char length, unsigned
     }
 
     int i;
-    for (i=0; i<6; i++) 
+    for (i=0; i<6; i++)
     {
         LED_3 = ~LED_3;
         delay_ms(150);
@@ -237,7 +237,7 @@ static void cmdConfigureTrial(unsigned char status, unsigned char length, unsign
     uByte2 timestamp;
     StateTransition st;
 
-    st_cnt = length / ST_NUM_BYTES; 
+    st_cnt = length / ST_NUM_BYTES;
     stTable = (StateTransition*)malloc(st_cnt*sizeof(StateTransition));
 
     saveData2Flash = frame[0];
@@ -249,7 +249,7 @@ static void cmdConfigureTrial(unsigned char status, unsigned char length, unsign
     }
 
     int i;
-    for (i=0; i<st_cnt; i++) 
+    for (i=0; i<st_cnt; i++)
     {
         st = stCreateConfig();
         timestamp.cval[0] = frame[ST_NUM_BYTES*i + 1];
@@ -259,8 +259,8 @@ static void cmdConfigureTrial(unsigned char status, unsigned char length, unsign
         st->params[1] = frame[ST_NUM_BYTES*i + 5];
         stTable[i] = st;
     }
-    
-    for (i=0; i<6; i++) 
+
+    for (i=0; i<6; i++)
     {
         LED_3 = ~LED_3;
         delay_ms(150);
@@ -288,8 +288,8 @@ static void cmdEcho(unsigned char status, unsigned char length, unsigned char *f
 
 
 /*****************************************************************************
-* Function Name : cmdTestAccel 
-* Description   : Create and send out over the radio a number of test packets that 
+* Function Name : cmdTestAccel
+* Description   : Create and send out over the radio a number of test packets that
 *                 contain the three X,Y, and Z values read from the
 *                 accelerometer.
 * Parameters    : status - Status field of the accelerometer test packet (not yet used)
@@ -325,20 +325,20 @@ static void cmdGetGyroCalibParam(unsigned char status, unsigned char length, uns
 {
     if(ROBOT)
     {
-        send(status, GYRO_CALIB_PARAM_LEN, gyroGetCalibParam(), CMD_GET_GYRO_CALIB_PARAM); 
+        send(status, GYRO_CALIB_PARAM_LEN, gyroGetCalibParam(), CMD_GET_GYRO_CALIB_PARAM);
     }
 }
 
 /*****************************************************************************
-* Function Name : cmdTestGyro 
-* Description   : Create and send out over the radio a number of test packets that 
+* Function Name : cmdTestGyro
+* Description   : Create and send out over the radio a number of test packets that
 *                 contain the three X,Y, and Z values read from the gyro.
 * Parameters    : status - Status field of gyro test packet (not yet used)
 *                 length - The length of the payload data array
 *                 frame - not used
 *****************************************************************************/
 static void cmdTestGyro(unsigned char status, unsigned char length, unsigned char* frame)
-{   
+{
     int i;
 
     for(i=0; i<NUM_TEST_PACKETS; i++)
@@ -353,9 +353,9 @@ static void cmdTestGyro(unsigned char status, unsigned char length, unsigned cha
 /*****************************************************************************
 * Function Name : cmdTestHall
 * Description   : For 10 seconds, set the state of LED_2 based on the state
-*                 of the Hall effect sensor connected to RB7. User needs 
+*                 of the Hall effect sensor connected to RB7. User needs
 *                 to manually try to switch the state of the Hall effect
-*                 sensor. Current hardware implementation uses a latched 
+*                 sensor. Current hardware implementation uses a latched
 *                 Hall (Melexis US1881).
 * Parameters    : status - Status field of gyro test packet (not yet used)
 *                 length - The length of the payload data array
@@ -389,7 +389,7 @@ static void cmdTestBatt(unsigned char status, unsigned char length, unsigned cha
     frame[0] = v_batt.cval[0];
     frame[1] = v_batt.cval[1];
 
-    
+
     AD1CHS0bits.CH0SA = 0b00001;      //Select AN0 for CH0 +ve input
     AD1CON1bits.SAMP = 1;
     while(!AD1CON1bits.DONE);
@@ -403,10 +403,10 @@ static void cmdTestBatt(unsigned char status, unsigned char length, unsigned cha
 }
 
 /*****************************************************************************
-* Function Name : cmdTestDflash 
+* Function Name : cmdTestDflash
 * Description   : Write four different strings to a page in the data flash,
 *                 then read them back and send their contents out over the
-*                 radio. Bonus points if you can identify the film without 
+*                 radio. Bonus points if you can identify the film without
 *                 reverting to the internet.
 * Parameters    : status - Status field of the dflash test packet (not yet used)
 *                 length - The length of the payload data array
@@ -414,7 +414,7 @@ static void cmdTestBatt(unsigned char status, unsigned char length, unsigned cha
 *****************************************************************************/
 static void cmdTestDflash(unsigned char status, unsigned char length, unsigned char* frame)
 {
-    Payload pld; 
+    Payload pld;
 
     unsigned char mem_data[256] = {};
     unsigned char *str1 = "You must be here to fix the cable.";  // 38+1
@@ -431,23 +431,23 @@ static void cmdTestDflash(unsigned char status, unsigned char length, unsigned c
 
     pld = payCreateEmpty(strlen(str1));
     dfmemRead(0x0100, 0, strlen(str1),  payGetData(pld));
-    send(status, strlen(str1), payGetData(pld), CMD_TEST_DFLASH); 
+    send(status, strlen(str1), payGetData(pld), CMD_TEST_DFLASH);
     payDelete(pld);
 
     delay_ms(100);
     pld = payCreateEmpty(strlen(str2));
     dfmemRead(0x0100, strlen(str1), strlen(str2), payGetData(pld));
-    send(status, strlen(str2), payGetData(pld), CMD_TEST_DFLASH); 
+    send(status, strlen(str2), payGetData(pld), CMD_TEST_DFLASH);
 
     delay_ms(100);
     pld = payCreateEmpty(strlen(str3));
     dfmemRead(0x0100, strlen(str1) + strlen(str2), strlen(str3), payGetData(pld));
-    send(status, strlen(str3), payGetData(pld), CMD_TEST_DFLASH); 
+    send(status, strlen(str3), payGetData(pld), CMD_TEST_DFLASH);
 
     delay_ms(100);
     pld = payCreateEmpty(strlen(str4));
     dfmemRead(0x0100, strlen(str1) + strlen(str2) + strlen(str3), strlen(str4), payGetData(pld));
-    send(status, strlen(str4), payGetData(pld), CMD_TEST_DFLASH); 
+    send(status, strlen(str4), payGetData(pld), CMD_TEST_DFLASH);
 
     payDelete(pld);
 
@@ -470,7 +470,7 @@ static void cmdGetSampleCount(unsigned char status, unsigned char length, unsign
     {
         frame[0] = sample_cnt.cval[0];
         frame[1] = sample_cnt.cval[1];
-        send(status, 2, frame, CMD_GET_SAMPLE_COUNT); 
+        send(status, 2, frame, CMD_GET_SAMPLE_COUNT);
     }
 }
 
@@ -527,7 +527,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt(void)
         roll.fval  = attGetRoll();
         xlXYZ = xlToString();
     }
-    
+
     //Sample back EMF
     AD1CHS0bits.CH0SA = 0b00001;      //Select AN1 (back EMF) for sampling
     AD1CON1bits.SAMP = 1;
@@ -618,7 +618,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt(void)
             buffer[i+8] = pitch.cval[i];
             buffer[i+12] = roll.cval[i];
         }
-        
+
         buffer[16] = xlXYZ[0];
         buffer[17] = xlXYZ[1];
         buffer[18] = xlXYZ[2];
@@ -627,7 +627,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt(void)
         buffer[21] = xlXYZ[5];
         buffer[22] = bemf.cval[0];
         buffer[23] = bemf.cval[1];
-        buffer[24] = 0; 
+        buffer[24] = 0;
         buffer[25] = 0;
         buffer[26] = hall_state;
         buffer[27] = v_batt.cval[0];

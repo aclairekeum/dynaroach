@@ -16,6 +16,6 @@ StateTransition stCreateConfig(void)
 
 void stConfigure(StateTransition st, unsigned int timestamp, unsigned char cmd)
 {
-    st->timestamp = (long)timestamp * (long)sclockGetMillisFactor(); //Convert from ms to system clock ticks 
+    st->timestamp = (long)timestamp * (long)sclockGetMillisFactor(); //Convert from ms to system clock ticks
     st->cmd = cmd;
 }
