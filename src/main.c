@@ -58,7 +58,7 @@ static void timer1Setup(void)
 
     conf_reg = T1_ON & T1_SOURCE_INT & T1_PS_1_1 & T1_GATE_OFF & T1_SYNC_EXT_OFF;
 //    period = 0x9C40; //timer period 1ms = period/FCY
-    period = 0x27100; //timer period 4ms = period/FCY
+    period = (unsigned int)0x27100; //timer period 4ms = period/FCY
 
     OpenTimer1(conf_reg, period);
     ConfigIntTimer1(T1_INT_PRIOR_4 & T1_INT_OFF);

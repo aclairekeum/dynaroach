@@ -53,7 +53,6 @@ static void cmdRunTrial(unsigned char status, unsigned char length, unsigned cha
 static void cmdEcho(unsigned char status, unsigned char length, unsigned char *frame);
 static void cmdSetMotor(unsigned char status, unsigned char length, unsigned char *frame);
 static void cmdSetSma(unsigned char status, unsigned char length, unsigned char *frame);
-static void cmdTestRadio(unsigned char status, unsigned char length, unsigned char* frame);
 static void cmdTestAccel(unsigned char status, unsigned char length, unsigned char* frame);
 static void cmdTestGyro(unsigned char status, unsigned char length, unsigned char* frame);
 static void cmdTestDflash(unsigned char status, unsigned char length, unsigned char* data);
@@ -151,8 +150,6 @@ static void cmdTxSavedData(unsigned char status, unsigned char length, unsigned 
         unsigned int tx_data_size = frame[4] + (frame[5] << 8);
         unsigned int i, j;
 
-        unsigned int end_page;
-
         MacPacket packet;
         Payload pld;
 
@@ -233,7 +230,6 @@ static void cmdConfigureSma(unsigned char status, unsigned char length, unsigned
 
 static void cmdConfigureTrial(unsigned char status, unsigned char length, unsigned char *frame)
 {
-    char n_cmds;
     uByte2 timestamp;
     StateTransition st;
 
@@ -417,15 +413,15 @@ static void cmdTestDflash(unsigned char status, unsigned char length, unsigned c
     Payload pld;
 
     unsigned char mem_data[256] = {};
-    unsigned char *str1 = "You must be here to fix the cable.";  // 38+1
-    unsigned char *str2 = "Lord. You can imagine where it goes from here.";  //46+1
-    unsigned char *str3 = "He fixes the cable?"; //19+1
-    unsigned char *str4 = "Don't be fatuous, Jeffrey."; //26+1
+    char *str1 = "You must be here to fix the cable.";  // 38+1
+    char *str2 = "Lord. You can imagine where it goes from here.";  //46+1
+    char *str3 = "He fixes the cable?"; //19+1
+    char *str4 = "Don't be fatuous, Jeffrey."; //26+1
 
-    strcpy(mem_data, str1);
-    strcpy(mem_data + strlen(str1), str2);
-    strcpy(mem_data + strlen(str1) + strlen(str2), str3);
-    strcpy(mem_data + strlen(str1) + strlen(str2) + strlen(str3), str4);
+    strcpy((char *)mem_data, str1);
+    strcpy((char *)mem_data + strlen(str1), str2);
+    strcpy((char *)mem_data + strlen(str1) + strlen(str2), str3);
+    strcpy((char *)mem_data + strlen(str1) + strlen(str2) + strlen(str3), str4);
 
     dfmemWrite (mem_data, sizeof(mem_data), 0x0100, 0, 1);
 
@@ -503,8 +499,8 @@ static void send(unsigned char status, unsigned char length, unsigned char *fram
 
 void __attribute__((interrupt, no_auto_psv)) _T1Interrupt(void)
 {
-    uByte4 t_ticks, yaw, pitch, roll, vdotx, vdoty, vdotz;
-    uByte2 bemf, v_batt, pot_val;
+    uByte4 t_ticks, yaw, pitch, roll;
+    uByte2 bemf, v_batt;
     unsigned char hall_state = 0;
 
     unsigned char* xlXYZ;
