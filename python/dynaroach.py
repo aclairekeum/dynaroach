@@ -110,6 +110,20 @@ class DynaRoach():
             print('\n')
             time.sleep(1)
 
+    def configure_settings(self, basestation_addr):
+        '''
+        Description:
+          This changges various persistent settings on the target.
+          Input is in the form of one hex strings.
+          Examples are "0x0110" or "0xabcd"
+        '''
+        basestation = int(basestation_addr, 16)
+        cmd_data =str(pack('B', basestation%256))
+        cmd_data+=str(pack('B', basestation/256)) 
+        print("sending data:" + str(cmd_data))
+        self.radio.send(cmd.STATUS_UNUSED, cmd.CONFIG_SETTINGS, cmd_data)
+        time.sleep(0.5)
+
     def configure_trial(self, trial):
         '''
             Description:

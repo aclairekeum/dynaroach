@@ -65,6 +65,18 @@ static void timer1Setup(void)
     ConfigIntTimer1(T1_INT_PRIOR_4 & T1_INT_OFF);
 }
 
+static void initSettings(void)
+{
+  unsigned char data[SETTINGS_SIZE];
+  dfmemRead(MEM_CONFIG_PAGE, 0, SETTINGS_SIZE, data);
+  intT networkAddr;
+  intT srcAddr;
+  networkAddr.c[0] = data[0];
+  networkAddr.c[1] = data[1];
+
+  networkSetBaseStationAddr(networkAddr.i);
+}
+
 int main ( void )
 {
     /* Initialization */
@@ -75,11 +87,12 @@ int main ( void )
     spicSetup();
     ppoolInit();
 
+
     //BEGIN RADIO SETUP
     radioInit(50, 10); // tx_queue length: 50, rx_queue length: 10
-    radioSetSrcAddr(NETWORK_SRC_ADDR);
     radioSetSrcPanID(NETWORK_BASESTATION_PAN_ID);
     radioSetChannel(NETWORK_BASESTATION_CHANNEL);
+    radioSetSrcAddr(NETWORK_SRC_ADDR);
     //END RADIO SETUP
 
     //BEGIN I2C SETUP
@@ -128,6 +141,8 @@ int main ( void )
     sclockSetup();
     timer1Setup();
     cmdSetup();
+
+    initSettings();
 
 
     attSetup(1.0/TIMER1_FCY);

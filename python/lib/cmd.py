@@ -19,6 +19,7 @@ RUN_TRIAL       = 0x12
 TX_SAVED_DATA   = 0x13
 SET_MOTOR       = 0x14
 SET_SMA         = 0x15
-ECHO            = 0x1F
 
+CONFIG_SETTINGS = 0x17
+ECHO            = 0x1F
 

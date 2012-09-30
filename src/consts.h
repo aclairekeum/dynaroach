@@ -50,18 +50,22 @@
 #define NUM_TEST_PACKETS        10
 #define IMU_DATA_LEN            6
 #define GYRO_CALIB_PARAM_LEN    12
-#define MEM_START_PAGE          0x100
+#define MEM_CONFIG_PAGE         0x100
+#define MEM_START_PAGE          0x101
 
 //Command constants
-#define CMD_CONFIGURE_SMA   0x10
-#define CMD_CONFIGURE_TRIAL 0x11
-#define CMD_RUN_TRIAL       0x12
-#define CMD_TX_SAVED_DATA   0x13
-#define CMD_SET_MOTOR       0x14
-#define CMD_SET_SMA         0x15
-#define CMD_SET_SAVE_DATA   0x16
-#define CMD_ECHO            0x1F
+#define CMD_CONFIGURE_SMA       0x10
+#define CMD_CONFIGURE_TRIAL     0x11
+#define CMD_RUN_TRIAL           0x12
+#define CMD_TX_SAVED_DATA       0x13
+#define CMD_SET_MOTOR           0x14
+#define CMD_SET_SMA             0x15
+#define CMD_SET_SAVE_DATA       0x16
+#define CMD_CONFIGURE_SETTINGS  0x17
+#define CMD_ECHO                0x1F
+
 
 #define TIMER1_FCY          250
 
+#define SETTINGS_SIZE       2
 #endif

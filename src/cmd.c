@@ -19,7 +19,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 #define FLASH_8MBIT_BYTES_PER_PAGE          264
 
 #define ROBOT 0
@@ -64,6 +63,7 @@ static void cmdTestBatt(unsigned char status, unsigned char length, unsigned cha
 static void cmdGetSampleCount(unsigned char status, unsigned char length, unsigned char *frame);
 static void cmdRunGyroCalib(unsigned char status, unsigned char length, unsigned char *frame);
 static void cmdGetGyroCalibParam(unsigned char status, unsigned char length, unsigned char *frame);
+static void cmdConfigureSettings(unsigned char status, unsigned char length, unsigned char *frame);
 static void send(unsigned char status, unsigned char length, unsigned char *frame, unsigned char type);
 
 //Delete these once trackable management code is working
@@ -98,6 +98,7 @@ void cmdSetup(void)
     cmd_func[CMD_GET_SAMPLE_COUNT] = &cmdGetSampleCount;
     cmd_func[CMD_RUN_GYRO_CALIB] = &cmdRunGyroCalib;
     cmd_func[CMD_GET_GYRO_CALIB_PARAM] = &cmdGetGyroCalibParam;
+    cmd_func[CMD_CONFIGURE_SETTINGS] = &cmdConfigureSettings;
 }
 
 static void cmdSetMotor(unsigned char status, unsigned char length, unsigned char *frame)
@@ -172,7 +173,7 @@ static void cmdTxSavedData(unsigned char status, unsigned char length, unsigned 
                     continue;
                 }
                 macSetDestPan(packet, NETWORK_BASESTATION_PAN_ID);
-                macSetDestAddr(packet, NETWORK_BASESTATION_ADDR);
+                macSetDestAddr(packet, networkGetBaseStationAddr());
                 pld = macGetPayload(packet);
                 dfmemRead(i, j, tx_data_size, payGetData(pld));
                 paySetType(pld, CMD_TX_SAVED_DATA);
@@ -472,6 +473,34 @@ static void cmdGetSampleCount(unsigned char status, unsigned char length, unsign
     }
 }
 
+static void cmdConfigureSettings(unsigned char status, unsigned char length, unsigned char *frame)
+{
+  int temp_page = MemLoc.index.page;
+  int temp_byte = MemLoc.index.byte;
+  unsigned char buffer[SETTINGS_SIZE];
+  static unsigned char buf_idx = 1;
+
+  MemLoc.index.page = MEM_CONFIG_PAGE;
+  MemLoc.index.byte = 0;
+
+  intT networkAddr;
+  networkAddr.c[0] = frame[0];
+  networkAddr.c[1] = frame[1];
+  buffer[0] = networkAddr.c[0];
+  buffer[1] = networkAddr.c[1];
+
+  networkSetBaseStationAddr(networkAddr.i);
+
+  dfmemWrite(buffer, SETTINGS_SIZE, MemLoc.index.page, MemLoc.index.byte, buf_idx);
+
+  LED_1 = ~LED_1;
+  delay_ms(100);
+  LED_1 = ~LED_1;
+
+  MemLoc.index.byte = temp_byte;
+  MemLoc.index.page = temp_page;
+}
+
 static void cmdNop(unsigned char status, unsigned char length, unsigned char *frame)
 {
     Nop();
@@ -488,7 +517,7 @@ static void send(unsigned char status, unsigned char length, unsigned char *fram
         return;
     }
     macSetDestPan(packet, NETWORK_BASESTATION_PAN_ID);
-    macSetDestAddr(packet, NETWORK_BASESTATION_ADDR);
+    macSetDestAddr(packet, networkGetBaseStationAddr());
     pld = macGetPayload(packet);
     paySetData(pld, length, frame);
     paySetType(pld, type);
