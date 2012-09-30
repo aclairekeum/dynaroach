@@ -62,6 +62,7 @@
 #define CMD_SET_SMA             0x15
 #define CMD_SET_SAVE_DATA       0x16
 #define CMD_CONFIGURE_SETTINGS  0x17
+#define CMD_SET_STREAMING       0x18
 #define CMD_ECHO                0x1F
 
 

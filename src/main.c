@@ -65,12 +65,22 @@ static void timer1Setup(void)
     ConfigIntTimer1(T1_INT_PRIOR_4 & T1_INT_OFF);
 }
 
+static void timer2Setup(void)
+{
+    unsigned int conf_reg, period;
+
+    conf_reg = T2_ON & T2_SOURCE_INT & T2_PS_1_1 & T2_GATE_OFF;
+//    period = 0x9C40; //timer period 2ms = period/FCY
+    period = (unsigned int)0x27100; //timer period 4ms = period/FCY
+    OpenTimer2(conf_reg, period);
+    ConfigIntTimer2(T2_INT_PRIOR_4 & T2_INT_OFF);
+}
+
 static void initSettings(void)
 {
   unsigned char data[SETTINGS_SIZE];
   dfmemRead(MEM_CONFIG_PAGE, 0, SETTINGS_SIZE, data);
   intT networkAddr;
-  intT srcAddr;
   networkAddr.c[0] = data[0];
   networkAddr.c[1] = data[1];
 
@@ -140,6 +150,7 @@ int main ( void )
     dfmemSetup();
     sclockSetup();
     timer1Setup();
+    timer2Setup();
     cmdSetup();
 
     initSettings();

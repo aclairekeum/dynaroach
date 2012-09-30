@@ -40,6 +40,8 @@ static unsigned char saveData2Flash = 0;
 static unsigned char st_cnt;
 static uByte2 sample_cnt;
 
+static int streamMod = 0;
+
 void(*cmd_func[MAX_CMD_FUNC_SIZE])(unsigned char, unsigned char, unsigned char*);
 
 StateTransition* stTable;
@@ -64,6 +66,8 @@ static void cmdGetSampleCount(unsigned char status, unsigned char length, unsign
 static void cmdRunGyroCalib(unsigned char status, unsigned char length, unsigned char *frame);
 static void cmdGetGyroCalibParam(unsigned char status, unsigned char length, unsigned char *frame);
 static void cmdConfigureSettings(unsigned char status, unsigned char length, unsigned char *frame);
+static void cmdSetDataStreaming(unsigned char status, unsigned char length, unsigned char *frame);
+
 static void send(unsigned char status, unsigned char length, unsigned char *frame, unsigned char type);
 
 //Delete these once trackable management code is working
@@ -99,6 +103,7 @@ void cmdSetup(void)
     cmd_func[CMD_RUN_GYRO_CALIB] = &cmdRunGyroCalib;
     cmd_func[CMD_GET_GYRO_CALIB_PARAM] = &cmdGetGyroCalibParam;
     cmd_func[CMD_CONFIGURE_SETTINGS] = &cmdConfigureSettings;
+    cmd_func[CMD_SET_STREAMING] = &cmdSetDataStreaming;
 }
 
 static void cmdSetMotor(unsigned char status, unsigned char length, unsigned char *frame)
@@ -501,6 +506,13 @@ static void cmdConfigureSettings(unsigned char status, unsigned char length, uns
   MemLoc.index.page = temp_page;
 }
 
+static void cmdSetDataStreaming(unsigned char status, unsigned char length, unsigned char *frame)
+{
+    attSetEstimateRunning(1);
+    LED_2=~LED_2;
+    _T2IE = 1;
+}
+
 static void cmdNop(unsigned char status, unsigned char length, unsigned char *frame)
 {
     Nop();
@@ -674,4 +686,80 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt(void)
     }
 
     _T1IF = 0;
+}
+
+void __attribute__((interrupt, no_auto_psv)) _T2Interrupt(void)
+{
+  if ((++streamMod)%500 == 0) {
+
+    uByte4 t_ticks, yaw, pitch, roll;
+    uByte2 bemf, v_batt;
+    unsigned char hall_state = 0;
+
+    unsigned char* xlXYZ;
+    unsigned char kDataLength = 35;
+    unsigned char buffer[kDataLength];
+    static unsigned char buf_idx = 1;
+    StateTransition st;
+    int i;
+
+    //Get pose estimates
+    if(attIsRunning())
+    {
+        attReadSensorData();
+        attEstimatePose();
+        yaw.fval = attGetYaw();
+        pitch.fval = attGetPitch();
+        roll.fval  = attGetRoll();
+        xlXYZ = xlToString();
+    }
+
+    //Sample back EMF
+    AD1CHS0bits.CH0SA = 0b00001;      //Select AN1 (back EMF) for sampling
+    AD1CON1bits.SAMP = 1;
+    while(!AD1CON1bits.DONE);
+    AD1CON1bits.SAMP = 0;
+    AD1CON1bits.DONE = 0;
+    bemf.sval = ADC1BUF0;
+
+    //Sample battery voltage
+    AD1CHS0bits.CH0SA = 0b00000;      //Select AN0 (battery voltage) for sampling
+    AD1CON1bits.SAMP = 1;
+    while(!AD1CON1bits.DONE);
+    AD1CON1bits.SAMP = 0;
+    AD1CON1bits.DONE = 0;
+    v_batt.sval = ADC1BUF0;
+
+    //Get the state of the hall effect sensor
+    hall_state = PORTBbits.RB7;
+    MD_LED_1 = ~MD_LED_1;
+
+    for(i = 0; i < 4; i++)
+    {
+        buffer[i] = t_ticks.cval[i];
+        buffer[i+4] = yaw.cval[i];
+        buffer[i+8] = pitch.cval[i];
+        buffer[i+12] = roll.cval[i];
+    }
+
+    buffer[16] = xlXYZ[0];
+    buffer[17] = xlXYZ[1];
+    buffer[18] = xlXYZ[2];
+    buffer[19] = xlXYZ[3];
+    buffer[20] = xlXYZ[4];
+    buffer[21] = xlXYZ[5];
+    buffer[22] = bemf.cval[0];
+    buffer[23] = bemf.cval[1];
+    buffer[24] = 0;
+    buffer[25] = 0;
+    buffer[26] = hall_state;
+    buffer[27] = v_batt.cval[0];
+    buffer[28] = v_batt.cval[1];
+
+    gyroDumpData(buffer+29);
+
+    int status = 1;
+    send(status, kDataLength, buffer, CMD_SET_STREAMING);
+  }
+  _T2IF = 0;
 }

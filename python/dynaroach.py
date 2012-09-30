@@ -89,6 +89,9 @@ class DynaRoach():
         elif typeID == cmd.GET_GYRO_CALIB_PARAM:
             self.gyro_offsets = list(unpack('<fff', data))
             print(self.gyro_offsets)
+        elif cmd.DATA_STREAMING:
+            datum = list(unpack('<L3f3h2HB4H', data))
+            print datum
 
     def echo(self):
         '''
@@ -123,6 +126,10 @@ class DynaRoach():
         print("sending data:" + str(cmd_data))
         self.radio.send(cmd.STATUS_UNUSED, cmd.CONFIG_SETTINGS, cmd_data)
         time.sleep(0.5)
+
+    def set_data_streaming(self):
+      self.radio.send(cmd.STATUS_UNUSED, cmd.DATA_STREAMING, [])
+      time.sleep(0.5)
 
     def configure_trial(self, trial):
         '''
