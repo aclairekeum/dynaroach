@@ -16,83 +16,83 @@
       <logicalFolder name="imageproc-lib"
                      displayName="imageproc-lib"
                      projectFiles="true">
-        <itemPath>../imageproc-lib/carray.c</itemPath>
-        <itemPath>../imageproc-lib/quat.c</itemPath>
-        <itemPath>../imageproc-lib/utils.h</itemPath>
-        <itemPath>../imageproc-lib/ppool.h</itemPath>
-        <itemPath>../imageproc-lib/gyro.c</itemPath>
-        <itemPath>../imageproc-lib/mac_packet.c</itemPath>
-        <itemPath>../imageproc-lib/init_default.h</itemPath>
-        <itemPath>../imageproc-lib/dfmem.c</itemPath>
-        <itemPath>../imageproc-lib/at86rf231_driver.c</itemPath>
-        <itemPath>../imageproc-lib/payload.h</itemPath>
-        <itemPath>../imageproc-lib/packet_queue.c</itemPath>
-        <itemPath>../imageproc-lib/radio.c</itemPath>
+        <itemPath>../imageproc-lib/carray.h</itemPath>
+        <itemPath>../imageproc-lib/mac_packet.h</itemPath>
+        <itemPath>../imageproc-lib/larray.c</itemPath>
         <itemPath>../imageproc-lib/spi_controller.c</itemPath>
-        <itemPath>../imageproc-lib/dfmem.h</itemPath>
+        <itemPath>../imageproc-lib/stopwatch.c</itemPath>
+        <itemPath>../imageproc-lib/payload.c</itemPath>
+        <itemPath>../imageproc-lib/radio.h</itemPath>
+        <itemPath>../imageproc-lib/xl.c</itemPath>
         <itemPath>../imageproc-lib/queue.c</itemPath>
-        <itemPath>../imageproc-lib/sclock.c</itemPath>
+        <itemPath>../imageproc-lib/lcd.c</itemPath>
+        <itemPath>../imageproc-lib/ipspi1.c</itemPath>
+        <itemPath>../imageproc-lib/init_default.h</itemPath>
+        <itemPath>../imageproc-lib/spi_controller.h</itemPath>
+        <itemPath>../imageproc-lib/counter.h</itemPath>
+        <itemPath>../imageproc-lib/libqw.c</itemPath>
+        <itemPath>../imageproc-lib/wii.h</itemPath>
+        <itemPath>../imageproc-lib/stopwatch.h</itemPath>
+        <itemPath>../imageproc-lib/payload.h</itemPath>
+        <itemPath>../imageproc-lib/queue.h</itemPath>
+        <itemPath>../imageproc-lib/payload_queue.h</itemPath>
+        <itemPath>../imageproc-lib/utils.h</itemPath>
+        <itemPath>../imageproc-lib/at86rf231.h</itemPath>
+        <itemPath>../imageproc-lib/at86rf231_driver.c</itemPath>
+        <itemPath>../imageproc-lib/counter.c</itemPath>
+        <itemPath>../imageproc-lib/dfilter.h</itemPath>
+        <itemPath>../imageproc-lib/packet_queue.c</itemPath>
+        <itemPath>../imageproc-lib/gyro.h</itemPath>
+        <itemPath>../imageproc-lib/gyro.c</itemPath>
+        <itemPath>../imageproc-lib/carray.c</itemPath>
+        <itemPath>../imageproc-lib/init_default.c</itemPath>
+        <itemPath>../imageproc-lib/ppool.c</itemPath>
+        <itemPath>../imageproc-lib/sclock.h</itemPath>
+        <itemPath>../imageproc-lib/radio.c</itemPath>
+        <itemPath>../imageproc-lib/at86rf231_driver.h</itemPath>
         <itemPath>../imageproc-lib/battery.h</itemPath>
+        <itemPath>../imageproc-lib/bams.h</itemPath>
+        <itemPath>../imageproc-lib/bams.c</itemPath>
+        <itemPath>../imageproc-lib/mac_packet.c</itemPath>
+        <itemPath>../imageproc-lib/ipspi1.h</itemPath>
+        <itemPath>../imageproc-lib/lcd.h</itemPath>
+        <itemPath>../imageproc-lib/dfmem.h</itemPath>
+        <itemPath>../imageproc-lib/battery.c</itemPath>
+        <itemPath>../imageproc-lib/sclock.c</itemPath>
+        <itemPath>../imageproc-lib/ppool.h</itemPath>
+        <itemPath>../imageproc-lib/larray.h</itemPath>
+        <itemPath>../imageproc-lib/wii.c</itemPath>
         <itemPath>../imageproc-lib/dfilter.c</itemPath>
         <itemPath>../imageproc-lib/xl.h</itemPath>
-        <itemPath>../imageproc-lib/lcd.h</itemPath>
-        <itemPath>../imageproc-lib/bams.h</itemPath>
-        <itemPath>../imageproc-lib/xl.c</itemPath>
-        <itemPath>../imageproc-lib/quat.h</itemPath>
-        <itemPath>../imageproc-lib/stopwatch.h</itemPath>
-        <itemPath>../imageproc-lib/battery.c</itemPath>
-        <itemPath>../imageproc-lib/ipspi1.c</itemPath>
-        <itemPath>../imageproc-lib/wii.c</itemPath>
-        <itemPath>../imageproc-lib/libqw.h</itemPath>
-        <itemPath>../imageproc-lib/libqw.c</itemPath>
-        <itemPath>../imageproc-lib/payload_queue.c</itemPath>
-        <itemPath>../imageproc-lib/dfilter.h</itemPath>
-        <itemPath>../imageproc-lib/init_default.c</itemPath>
-        <itemPath>../imageproc-lib/at86rf231.h</itemPath>
-        <itemPath>../imageproc-lib/radio.h</itemPath>
-        <itemPath>../imageproc-lib/ipspi1.h</itemPath>
-        <itemPath>../imageproc-lib/counter.h</itemPath>
         <itemPath>../imageproc-lib/generic_typedefs.h</itemPath>
-        <itemPath>../imageproc-lib/queue.h</itemPath>
-        <itemPath>../imageproc-lib/payload.c</itemPath>
-        <itemPath>../imageproc-lib/carray.h</itemPath>
-        <itemPath>../imageproc-lib/payload_queue.h</itemPath>
-        <itemPath>../imageproc-lib/bams.c</itemPath>
-        <itemPath>../imageproc-lib/wii.h</itemPath>
-        <itemPath>../imageproc-lib/larray.h</itemPath>
-        <itemPath>../imageproc-lib/gyro.h</itemPath>
-        <itemPath>../imageproc-lib/lcd.c</itemPath>
-        <itemPath>../imageproc-lib/counter.c</itemPath>
-        <itemPath>../imageproc-lib/sclock.h</itemPath>
-        <itemPath>../imageproc-lib/at86rf231_driver.h</itemPath>
-        <itemPath>../imageproc-lib/mac_packet.h</itemPath>
-        <itemPath>../imageproc-lib/stopwatch.c</itemPath>
-        <itemPath>../imageproc-lib/larray.c</itemPath>
-        <itemPath>../imageproc-lib/spi_controller.h</itemPath>
-        <itemPath>../imageproc-lib/ppool.c</itemPath>
+        <itemPath>../imageproc-lib/quat.h</itemPath>
+        <itemPath>../imageproc-lib/payload_queue.c</itemPath>
+        <itemPath>../imageproc-lib/quat.c</itemPath>
         <itemPath>../imageproc-lib/packet_queue.h</itemPath>
+        <itemPath>../imageproc-lib/dfmem.c</itemPath>
+        <itemPath>../imageproc-lib/libqw.h</itemPath>
         <itemPath>../imageproc-lib/delay.s</itemPath>
         <itemPath>../imageproc-lib/div16.s</itemPath>
         <itemPath>../imageproc-lib/udiv16.s</itemPath>
       </logicalFolder>
       <logicalFolder name="src" displayName="src" projectFiles="true">
-        <itemPath>src/trial.c</itemPath>
-        <itemPath>src/statetransition.h</itemPath>
-        <itemPath>src/consts.h</itemPath>
-        <itemPath>src/statetransition.c</itemPath>
-        <itemPath>src/attitude_q.h</itemPath>
-        <itemPath>src/cmd.h</itemPath>
         <itemPath>src/motor_ctrl.h</itemPath>
-        <itemPath>src/motor_ctrl.c</itemPath>
-        <itemPath>src/sma.c</itemPath>
-        <itemPath>src/cmd.c</itemPath>
-        <itemPath>src/led.h</itemPath>
-        <itemPath>src/main.c</itemPath>
+        <itemPath>src/attitude_q.h</itemPath>
         <itemPath>src/trial.h</itemPath>
         <itemPath>src/sma.h</itemPath>
         <itemPath>src/attitude_q.c</itemPath>
-        <itemPath>src/network.h</itemPath>
+        <itemPath>src/trial.c</itemPath>
+        <itemPath>src/sma.c</itemPath>
+        <itemPath>src/cmd.c</itemPath>
+        <itemPath>src/statetransition.h</itemPath>
         <itemPath>src/network.c</itemPath>
+        <itemPath>src/motor_ctrl.c</itemPath>
+        <itemPath>src/main.c</itemPath>
+        <itemPath>src/consts.h</itemPath>
+        <itemPath>src/network.h</itemPath>
+        <itemPath>src/statetransition.c</itemPath>
+        <itemPath>src/cmd.h</itemPath>
+        <itemPath>src/led.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -153,8 +153,7 @@
         <property key="enable-short-double" value="false"/>
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
-        <property key="extra-include-directories"
-                  value="/home/luke/Dropbox/Course/research/dynaroach/src;/home/luke/Dropbox/Course/research/imageproc-lib"/>
+        <property key="extra-include-directories" value="src;../imageproc-lib"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>
