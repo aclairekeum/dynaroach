@@ -508,9 +508,13 @@ static void cmdConfigureSettings(unsigned char status, unsigned char length, uns
 
 static void cmdSetDataStreaming(unsigned char status, unsigned char length, unsigned char *frame)
 {
-    attSetEstimateRunning(1);
-    LED_2=~LED_2;
-    _T2IE = 1;
+    if (frame[0] == 0x00) {
+      _T2IE = 0;
+      attSetEstimateRunning(0);
+    } else {
+      attSetEstimateRunning(1);
+      _T2IE = 1;
+    }
 }
 
 static void cmdNop(unsigned char status, unsigned char length, unsigned char *frame)
