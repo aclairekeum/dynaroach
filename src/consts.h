@@ -51,7 +51,7 @@
 #define IMU_DATA_LEN            6
 #define GYRO_CALIB_PARAM_LEN    12
 #define MEM_CONFIG_PAGE         0x100
-#define MEM_START_PAGE          0x101
+#define MEM_START_PAGE          0x200
 
 //Command constants
 #define CMD_CONFIGURE_SMA       0x10
