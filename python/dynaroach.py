@@ -91,7 +91,7 @@ class DynaRoach():
             print(self.gyro_offsets)
         elif cmd.DATA_STREAMING:
             datum = list(unpack('<L3f3h2HB4H', data))
-            print datum[4], datum[5], datum[6]
+            print datum[6:]
 
     def echo(self):
         '''
@@ -126,6 +126,11 @@ class DynaRoach():
         print("sending data:" + str(cmd_data))
         self.radio.send(cmd.STATUS_UNUSED, cmd.CONFIG_SETTINGS, cmd_data)
         time.sleep(0.5)
+    def set_motor_config(self, rising_duty_cycle, falling_duty_cycle):
+      cmd_data = str(pack('f', rising_duty_cycle)); 
+      cmd_data += str(pack('f', falling_duty_cycle)); 
+      self.radio.send(cmd.STATUS_UNUSED, cmd.MOTOR_CONFIG, cmd_data)
+      time.sleep(0.5)
 
     def set_data_streaming(self, val):
       data = ''.join(chr(val));

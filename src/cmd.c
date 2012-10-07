@@ -31,6 +31,15 @@ static union {
     unsigned char chr_index[4];
 } MemLoc;
 
+#define MOTOR_CONFIG_LENGTH (2*sizeof(float))
+static union {
+  struct {
+    float rising_edge_duty_cycle;
+    float falling_edge_duty_cycle;
+  } control;
+  unsigned char chr_index[sizeof(float)*2];
+} MotorConfig;
+
 
 unsigned volatile int ADCBuffer[1] __attribute__((space(dma)));
 
@@ -41,6 +50,7 @@ static unsigned char st_cnt;
 static uByte2 sample_cnt;
 
 static int streamMod = 0;
+static int is_data_streaming = 0;
 
 void(*cmd_func[MAX_CMD_FUNC_SIZE])(unsigned char, unsigned char, unsigned char*);
 
@@ -67,7 +77,7 @@ static void cmdRunGyroCalib(unsigned char status, unsigned char length, unsigned
 static void cmdGetGyroCalibParam(unsigned char status, unsigned char length, unsigned char *frame);
 static void cmdConfigureSettings(unsigned char status, unsigned char length, unsigned char *frame);
 static void cmdSetDataStreaming(unsigned char status, unsigned char length, unsigned char *frame);
-
+static void cmdSetMotorConfig(unsigned char status, unsigned char length, unsigned char *frame);
 static void send(unsigned char status, unsigned char length, unsigned char *frame, unsigned char type);
 
 //Delete these once trackable management code is working
@@ -104,11 +114,26 @@ void cmdSetup(void)
     cmd_func[CMD_GET_GYRO_CALIB_PARAM] = &cmdGetGyroCalibParam;
     cmd_func[CMD_CONFIGURE_SETTINGS] = &cmdConfigureSettings;
     cmd_func[CMD_SET_STREAMING] = &cmdSetDataStreaming;
+    cmd_func[CMD_SET_MOTOR_CONFIG] = &cmdSetMotorConfig;
+
+    MotorConfig.control.rising_edge_duty_cycle = 6;
+    MotorConfig.control.falling_edge_duty_cycle = 8;
 }
 
 static void cmdSetMotor(unsigned char status, unsigned char length, unsigned char *frame)
 {
     mcSetDutyCycle(frame[0], frame[1]);
+}
+
+static void cmdSetMotorConfig(unsigned char status, unsigned char length, unsigned char *frame)
+{
+  int i;
+  for(i=0; i < MOTOR_CONFIG_LENGTH; i++)
+  {
+    MotorConfig.chr_index[i] = frame[i];
+  }
+  LED_2 = ~LED_2;
+  LED_1 = ~LED_1;
 }
 
 static void cmdSetSma(unsigned char status, unsigned char length, unsigned char *frame)
@@ -509,11 +534,11 @@ static void cmdConfigureSettings(unsigned char status, unsigned char length, uns
 static void cmdSetDataStreaming(unsigned char status, unsigned char length, unsigned char *frame)
 {
     if (frame[0] == 0x00) {
-      _T2IE = 0;
+      is_data_streaming = 0;
       attSetEstimateRunning(0);
     } else {
       attSetEstimateRunning(1);
-      _T2IE = 1;
+      is_data_streaming = 1;
     }
 }
 
@@ -692,10 +717,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt(void)
     _T1IF = 0;
 }
 
-void __attribute__((interrupt, no_auto_psv)) _T2Interrupt(void)
-{
-  if ((++streamMod)%500 == 0) {
-
+void sendCurrentSensors() {
     uByte4 t_ticks, yaw, pitch, roll;
     uByte2 bemf, v_batt;
     unsigned char hall_state = 0;
@@ -764,6 +786,33 @@ void __attribute__((interrupt, no_auto_psv)) _T2Interrupt(void)
 
     int status = 1;
     send(status, kDataLength, buffer, CMD_SET_STREAMING);
+}
+
+
+void motor_rising_edge() {
+     MD_LED_2 = 1;
+     mcSetDutyCycle(1, MotorConfig.control.rising_edge_duty_cycle);
+}
+
+void motor_falling_edge() {
+     MD_LED_2 = 0;
+     mcSetDutyCycle(1, MotorConfig.control.rising_edge_duty_cycle);
+}
+
+static int prevHall = 0;
+
+void __attribute__((interrupt, no_auto_psv)) _T2Interrupt(void)
+{
+  if (is_data_streaming && (++streamMod)%500 == 0) {
+    sendCurrentSensors();
   }
+
+  short hall = PORTBbits.RB7;
+  if (prevHall != 0 && 0 == hall) {
+    motor_falling_edge();
+  } else if(0 == prevHall & hall != 0) {
+    motor_rising_edge();
+  }
+  prevHall = hall;
   _T2IF = 0;
 }
