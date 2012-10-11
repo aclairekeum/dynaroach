@@ -32,12 +32,9 @@ static union {
 } MemLoc;
 
 #define MOTOR_CONFIG_LENGTH (2*sizeof(float))
-static union {
-  struct {
-    float rising_edge_duty_cycle;
-    float falling_edge_duty_cycle;
-  } control;
-  unsigned char chr_index[sizeof(float)*2];
+static struct {
+  float rising_edge_duty_cycle;
+  float falling_edge_duty_cycle;
 } MotorConfig;
 
 
@@ -116,8 +113,8 @@ void cmdSetup(void)
     cmd_func[CMD_SET_STREAMING] = &cmdSetDataStreaming;
     cmd_func[CMD_SET_MOTOR_CONFIG] = &cmdSetMotorConfig;
 
-    MotorConfig.control.rising_edge_duty_cycle = 6;
-    MotorConfig.control.falling_edge_duty_cycle = 8;
+    MotorConfig.rising_edge_duty_cycle = 0;
+    MotorConfig.falling_edge_duty_cycle = 0;
 }
 
 static void cmdSetMotor(unsigned char status, unsigned char length, unsigned char *frame)
@@ -128,10 +125,16 @@ static void cmdSetMotor(unsigned char status, unsigned char length, unsigned cha
 static void cmdSetMotorConfig(unsigned char status, unsigned char length, unsigned char *frame)
 {
   int i;
-  for(i=0; i < MOTOR_CONFIG_LENGTH; i++)
-  {
-    MotorConfig.chr_index[i] = frame[i];
-  }
+  intT rising_duty;
+  intT falling_duty;
+  rising_duty.c[0] = frame[0];
+  rising_duty.c[1] = frame[1];
+  falling_duty.c[0] = frame[2];
+  falling_duty.c[1] = frame[3];
+
+  MotorConfig.rising_edge_duty_cycle = rising_duty.i/1000.0f;
+  MotorConfig.falling_edge_duty_cycle = falling_duty.i/1000.0f;
+
   LED_2 = ~LED_2;
   LED_1 = ~LED_1;
 }
@@ -791,12 +794,12 @@ void sendCurrentSensors() {
 
 void motor_rising_edge() {
      MD_LED_2 = 1;
-     mcSetDutyCycle(1, MotorConfig.control.rising_edge_duty_cycle);
+     mcSetDutyCycle(1, MotorConfig.rising_edge_duty_cycle);
 }
 
 void motor_falling_edge() {
      MD_LED_2 = 0;
-     mcSetDutyCycle(1, MotorConfig.control.rising_edge_duty_cycle);
+     mcSetDutyCycle(1, MotorConfig.falling_edge_duty_cycle);
 }
 
 static int prevHall = 0;

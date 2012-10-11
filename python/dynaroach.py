@@ -126,9 +126,10 @@ class DynaRoach():
         print("sending data:" + str(cmd_data))
         self.radio.send(cmd.STATUS_UNUSED, cmd.CONFIG_SETTINGS, cmd_data)
         time.sleep(0.5)
+
     def set_motor_config(self, rising_duty_cycle, falling_duty_cycle):
-      cmd_data = str(pack('f', rising_duty_cycle)); 
-      cmd_data += str(pack('f', falling_duty_cycle)); 
+      cmd_data = str(pack('h', rising_duty_cycle)); 
+      cmd_data += str(pack('h', falling_duty_cycle)); 
       self.radio.send(cmd.STATUS_UNUSED, cmd.MOTOR_CONFIG, cmd_data)
       time.sleep(0.5)
 
