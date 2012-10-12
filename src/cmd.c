@@ -137,6 +137,12 @@ static void cmdSetMotorConfig(unsigned char status, unsigned char length, unsign
 
   LED_2 = ~LED_2;
   LED_1 = ~LED_1;
+  short hall = PORTBbits.RB7;
+  if (0 == hall) {
+    mcSetDutyCycle(1, MotorConfig.falling_edge_duty_cycle);
+  } else {
+    mcSetDutyCycle(1, MotorConfig.rising_edge_duty_cycle);
+  }
 }
 
 static void cmdSetSma(unsigned char status, unsigned char length, unsigned char *frame)
