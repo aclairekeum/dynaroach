@@ -21,6 +21,19 @@ void mcSetup(void)
 
 void mcSetDutyCycle(unsigned char channel, float duty_cycle)
 {
+    if (duty_cycle > 0) {
+        //Forward case: set 1H to PWM, override 1L and set high
+        P1OVDCONbits.POVD1L = 0;
+        P1OVDCONbits.POVD1H = 1;
+        P1OVDCONbits.POUT1L = 0;
+    } else {
+        //Reverse case: set 1L to PWM, override 1H and set  (to enable high impedance during off times)
+        P1OVDCONbits.POVD1L = 1;
+        P1OVDCONbits.POVD1H = 0;
+        P1OVDCONbits.POUT1H = 0;
+        duty_cycle *= -1;
+    }
+
     _Q16 temp = _Q16mult(dutyCycleQ, _Q16ftoi(duty_cycle));
     unsigned int pdc_value = (unsigned int) _itofQ16(temp);
     SetDCMCPWM(channel, pdc_value, 0);
