@@ -128,8 +128,8 @@ class DynaRoach():
         time.sleep(0.5)
 
     def set_motor_config(self, rising_duty_cycle, falling_duty_cycle):
-      cmd_data = str(pack('h', rising_duty_cycle)); 
-      cmd_data += str(pack('h', falling_duty_cycle)); 
+      cmd_data = str(pack('h', int(rising_duty_cycle*1000))); 
+      cmd_data += str(pack('h', int(falling_duty_cycle*1000))); 
       self.radio.send(cmd.STATUS_UNUSED, cmd.MOTOR_CONFIG, cmd_data)
       time.sleep(0.5)
 
