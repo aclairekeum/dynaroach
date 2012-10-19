@@ -812,7 +812,7 @@ static int prevHall = 0;
 
 void __attribute__((interrupt, no_auto_psv)) _T2Interrupt(void)
 {
-  if (is_data_streaming && (++streamMod)%500 == 0) {
+  if (is_data_streaming && (++streamMod)%50 == 0) {
     sendCurrentSensors();
   }
 

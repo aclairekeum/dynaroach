@@ -71,8 +71,8 @@ static void timer2Setup(void)
     unsigned int conf_reg, period;
 
     conf_reg = T2_ON & T2_SOURCE_INT & T2_PS_1_1 & T2_GATE_OFF;
-//    period = 0x9C40; //timer period 2ms = period/FCY
-    period = (unsigned int)0x27100; //timer period 4ms = period/FCY
+    //Period in us is 1/40*period.
+    period = (unsigned int)0x9c40; //timer period 1ms = period/FCY.
     OpenTimer2(conf_reg, period);
     ConfigIntTimer2(T2_INT_PRIOR_4 & T2_INT_OFF);
     _T2IE = 1;
