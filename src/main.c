@@ -58,9 +58,7 @@ static void timer1Setup(void)
     unsigned int conf_reg;
     unsigned long period;
     conf_reg = T1_ON & T1_SOURCE_INT & T1_PS_1_256 & T1_GATE_OFF & T1_SYNC_EXT_OFF;
-//    period = 0x9C40; //timer period 1ms = period/FCY
-    //period = (unsigned int)0x27100; //timer period 4ms = period/FCY
-    period = (unsigned int)0x57100; //timer period 4ms = period/FCY
+    period = (unsigned int)0x271; //timer period 4ms = period/FCY * prescaler
 
     OpenTimer1(conf_reg, period);
     ConfigIntTimer1(T1_INT_PRIOR_4 & T1_INT_OFF);
@@ -70,9 +68,11 @@ static void timer2Setup(void)
 {
     unsigned int conf_reg, period;
 
-    conf_reg = T2_ON & T2_SOURCE_INT & T2_PS_1_1 & T2_GATE_OFF;
+    conf_reg = T2_ON & T2_SOURCE_INT & T2_PS_1_256 & T2_GATE_OFF;
     //Period in us is 1/40*period.
-    period = (unsigned int)0x9c40; //timer period 1ms = period/FCY.
+    //period = (unsigned int)0x9c40; //timer period 1ms = period/FCY.
+    //period = (unsigned int)0x9c40; //timer period 1ms = period/FCY.
+    period = (unsigned int)0x138; //timer period 1ms = period/FCY.
     OpenTimer2(conf_reg, period);
     ConfigIntTimer2(T2_INT_PRIOR_4 & T2_INT_OFF);
     _T2IE = 1;

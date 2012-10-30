@@ -23,5 +23,6 @@ SET_SMA         = 0x15
 CONFIG_SETTINGS = 0x17
 DATA_STREAMING  = 0x18
 MOTOR_CONFIG    = 0x19
+RESET           = 0x1A
 ECHO            = 0x1F
 

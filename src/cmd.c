@@ -21,7 +21,9 @@
 
 #define FLASH_8MBIT_BYTES_PER_PAGE          264
 
-#define ROBOT 0
+
+//#define ROBOT 0
+#define ROBOT 1
 
 static union {
     struct {
@@ -75,6 +77,7 @@ static void cmdGetGyroCalibParam(unsigned char status, unsigned char length, uns
 static void cmdConfigureSettings(unsigned char status, unsigned char length, unsigned char *frame);
 static void cmdSetDataStreaming(unsigned char status, unsigned char length, unsigned char *frame);
 static void cmdSetMotorConfig(unsigned char status, unsigned char length, unsigned char *frame);
+static void cmdReset(unsigned char status, unsigned char length, unsigned char *frame);
 static void send(unsigned char status, unsigned char length, unsigned char *frame, unsigned char type);
 
 //Delete these once trackable management code is working
@@ -112,6 +115,7 @@ void cmdSetup(void)
     cmd_func[CMD_CONFIGURE_SETTINGS] = &cmdConfigureSettings;
     cmd_func[CMD_SET_STREAMING] = &cmdSetDataStreaming;
     cmd_func[CMD_SET_MOTOR_CONFIG] = &cmdSetMotorConfig;
+    cmd_func[CMD_RESET] = &cmdReset;
 
     MotorConfig.rising_edge_duty_cycle = 0;
     MotorConfig.falling_edge_duty_cycle = 0;
@@ -293,8 +297,11 @@ static void cmdConfigureTrial(unsigned char status, unsigned char length, unsign
         timestamp.cval[0] = frame[ST_NUM_BYTES*i + 1];
         timestamp.cval[1] = frame[ST_NUM_BYTES*i + 2];
         stConfigure(st, timestamp.sval, frame[ST_NUM_BYTES*i + 3]);
-        st->params[0] = frame[ST_NUM_BYTES*i + 4];
-        st->params[1] = frame[ST_NUM_BYTES*i + 5];
+        int j;
+        for (j=0; j < MAX_PARAMS; ++j)
+        {
+          st->params[j] = frame[ST_NUM_BYTES*i + 4 + j];
+        }
         stTable[i] = st;
     }
 
@@ -551,6 +558,11 @@ static void cmdSetDataStreaming(unsigned char status, unsigned char length, unsi
     }
 }
 
+static void cmdReset(unsigned char status, unsigned char length, unsigned char *frame)
+{
+  __asm__ volatile ("reset");
+}
+
 static void cmdNop(unsigned char status, unsigned char length, unsigned char *frame)
 {
     Nop();
@@ -677,7 +689,18 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt(void)
             //Turn off SMA
             mcSetDutyCycle(3, 0);
             //Turn off Motor
+            MotorConfig.rising_edge_duty_cycle = 0.0f;
+            MotorConfig.falling_edge_duty_cycle = 0.0f;
             mcSetDutyCycle(1, 0);
+
+            //Free up the resources
+            int i;
+            for (i=0; i < st_cnt; ++i)
+            {
+              stFree(stTable[i]);
+            }
+            free(stTable);
+
             _T1IE = 0;
             break;
         }else
@@ -717,6 +740,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt(void)
         sample_cnt.sval++;
         if(MemLoc.index.byte + kDataLength > 264)
         {
+            MD_LED_1 = ~MD_LED_1;
             dfmemWriteBuffer2MemoryNoErase(MemLoc.index.page++, buf_idx);
             MemLoc.index.byte = 0;
             buf_idx ^= 0x01;

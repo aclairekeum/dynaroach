@@ -64,8 +64,8 @@
 #define CMD_CONFIGURE_SETTINGS  0x17
 #define CMD_SET_STREAMING       0x18
 #define CMD_SET_MOTOR_CONFIG    0x19
+#define CMD_RESET               0x1A
 #define CMD_ECHO                0x1F
-
 
 #define TIMER1_FCY          250
 

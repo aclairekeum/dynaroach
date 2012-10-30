@@ -138,6 +138,10 @@ class DynaRoach():
       self.radio.send(cmd.STATUS_UNUSED, cmd.DATA_STREAMING, data)
       time.sleep(0.5)
 
+    def reset(self):
+      self.radio.send(cmd.STATUS_UNUSED, cmd.RESET, [])
+      time.sleep(5)
+    
     def configure_trial(self, trial):
         '''
             Description:
@@ -284,7 +288,7 @@ class DynaRoach():
             return
         else:
             self.data_cnt = 0
-            start_page = 0x100
+            start_page = 0x200
             print("Transmitting saved data...")
             self.state_data = []
             self.data_cnt = 0
@@ -318,6 +322,7 @@ class DynaRoach():
     def save_trial_data(self, fname):
         print('%d total state data were received.' % self.data_cnt)
         state_data_arr = np.array(self.state_data)
+        print state_data_arr 
         fmt = '%d, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d'
         np.savetxt(fname, state_data_arr, fmt)
         #np.savetxt(self.datestring() + ".csv", state_data_arr, fmt)
@@ -363,6 +368,8 @@ class Trial():
         outfile.write('%s' % kwds)
         outfile.close()
 
+    def add_state_transition(self, state_transition):
+      self.state_transitions.append(state_transition)
 
     def load_from_file(self, fname):
         try:

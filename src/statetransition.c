@@ -13,6 +13,10 @@ StateTransition stCreateConfig(void)
     return st;
 }
 
+void stFree(StateTransition st)
+{
+  free(st->params);
+}
 
 void stConfigure(StateTransition st, unsigned int timestamp, unsigned char cmd)
 {
