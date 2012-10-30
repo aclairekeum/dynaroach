@@ -140,7 +140,7 @@ class DynaRoach():
 
     def reset(self):
       self.radio.send(cmd.STATUS_UNUSED, cmd.RESET, [])
-      time.sleep(5)
+      time.sleep(11)
     
     def configure_trial(self, trial):
         '''
