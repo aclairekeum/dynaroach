@@ -136,8 +136,8 @@ static void cmdSetMotorConfig(unsigned char status, unsigned char length, unsign
   falling_duty.c[0] = frame[2];
   falling_duty.c[1] = frame[3];
 
-  MotorConfig.rising_edge_duty_cycle = rising_duty.i/1000.0f;
-  MotorConfig.falling_edge_duty_cycle = falling_duty.i/1000.0f;
+  MotorConfig.rising_edge_duty_cycle = rising_duty.i/100.0f;
+  MotorConfig.falling_edge_duty_cycle = falling_duty.i/100.0f;
 
   LED_2 = ~LED_2;
   LED_1 = ~LED_1;
@@ -506,10 +506,10 @@ static void cmdTestSweep(unsigned char status, unsigned char length, unsigned ch
   intT temp;
   temp.c[0] = frame[0];
   temp.c[1] = frame[1];
-  sweep_start_speed = temp.i/1000.f;
+  sweep_start_speed = temp.i/100.f;
   temp.c[0] = frame[2];
   temp.c[1] = frame[3];
-  sweep_stop_speed = temp.i/1000.f;
+  sweep_stop_speed = temp.i/100.f;
   do_sweep = 1;
   //sweep_start_speed = 15;
   //sweep_stop_speed = 40;

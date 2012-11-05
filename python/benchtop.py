@@ -18,8 +18,8 @@ def doRun(motor_speed, outdir, robot):
   #trial.save_data = False
   
   #split motor speed up into 2 bytes.
-  cmd_data = pack('<h', motor_speed*1000);
-  cmd_data += pack('<h', motor_speed*1000);
+  cmd_data = pack('<h', motor_speed*100);
+  cmd_data += pack('<h', motor_speed*100);
   motor_on = dr.StateTransition(0, dr.cmd.MOTOR_CONFIG, [ord(x) for x in cmd_data])
   trial.add_state_transition(motor_on)
 
@@ -61,8 +61,8 @@ def doSweep(motor_speed_min, motor_speed_max, time_run, outdir, robot):
   on_time = 0
   for motor_speed in motor_range:
     #split motor speed up into 2 bytes.
-    cmd_data = pack('<h', motor_speed*1000);
-    cmd_data += pack('<h', motor_speed*1000);
+    cmd_data = pack('<h', motor_speed*100);
+    cmd_data += pack('<h', motor_speed*100);
     motor_on = dr.StateTransition(on_time, dr.cmd.MOTOR_CONFIG, [ord(x) for x in cmd_data])
     on_time += 500.0
     print motor_speed
@@ -95,8 +95,8 @@ def doHardwareSweep(motor_speed_min, motor_speed_max, time_run, outdir, robot):
   #trial.save_data = False
   
   #split motor speed up into 2 bytes.
-  cmd_data = pack('<h', motor_speed_min*1000);
-  cmd_data += pack('<h', motor_speed_max*1000);
+  cmd_data = pack('<h', motor_speed_min*100);
+  cmd_data += pack('<h', motor_speed_max*100);
   motor_sweep = dr.StateTransition(0, dr.cmd.TEST_MOTOR_SWEEP, [ord(x) for x in cmd_data])
   trial.add_state_transition(motor_sweep)
 
@@ -130,7 +130,7 @@ def main():
     outdir = sys.argv[2]
   else:
     print("No outdir defined, argv[2]")
-  doHardwareSweep(14, 30, 10000, outdir, robot)
+  doHardwareSweep(14, 60, 9000, outdir, robot)
   # motor_speeds = np.linspace(14, 30, 10)
   # for motor_speed in motor_speeds:
     # doRun(motor_speed, outdir, robot)
