@@ -3,7 +3,7 @@ import sys
 import numpy
 import math
 import glob
-
+import scipy.fftpack
 
 #column titles
 TIME = 0;
@@ -31,8 +31,7 @@ def reasonableData(data, line):
   length = len(data)
   return data[length-1][TIME] < line[TIME]
 
-def makeGraphsOf(filename):
-  toPlot = [1, 2, 3, 4, 5, 6, 7, 10, 11]
+def parseData(filename):
   data = []
   f = open(filename)
   f.readline() #ignore the first data
@@ -43,6 +42,12 @@ def makeGraphsOf(filename):
 
   dataArray = numpy.array(data);
   dataArray[:, 0] = dataArray[:, 0]/(600) #FIXME estimate to go back to real time
+  return dataArray
+
+def makeGraphsOf(filename):
+  toPlot = [1, 2, 3, 4, 5, 6, 7, 10, 11]
+  dataArray = parseData(filename)
+
   for plotType  in toPlot:
     pyplot.figure()
     pyplot.xlabel("Time (~ms)")
@@ -51,10 +56,40 @@ def makeGraphsOf(filename):
     pyplot.plot(dataArray[:,0], dataArray[:,plotType])
     pyplot.savefig(filename+"_"+names[plotType]+".png");
 
+def getFft(filename, plotType):
+  dataArray = parseData(filename)
+  backemfData = dataArray[:, plotType]
+  fft = scipy.fftpack.rfft(backemfData)
+  fft = fft[1:-1]
+  #pyplot.figure()
+  pyplot.semilogx(fft, '-')
+
+def graphMulti(filename, plotType):
+  dataArray = parseData(filename)
+  pyplot.plot(dataArray[:, plotType], '-')
+
 def main():
   files = glob.glob(sys.argv[1]+"/*.csv")
+  #files = files[1::2]
+  
+  #for filename in files:
+  #  makeGraphsOf(filename)
+  
   for filename in files:
-    makeGraphsOf(filename)
+    pyplot.figure()
+    getFft(filename, BACK_EMF)
+    pyplot.title("FFT of Back emf")
+    pyplot.xlabel("Frequency")
+    pyplot.ylabel("Magnitude")
+    pyplot.savefig(filename+"_fft.png")
+  
+  # for filename in files:
+    # graphMulti(filename, GYRO_Z)
 
+  # pyplot.title("Gyro Y")
+  # pyplot.ylabel("Gyro Value")
+  # pyplot.xlabel("Time (~ms)")
+  # pyplot.legend(files)
+  # pyplot.show()
 if __name__ == "__main__":
   main()

@@ -90,8 +90,10 @@ class DynaRoach():
             self.gyro_offsets = list(unpack('<fff', data))
             print(self.gyro_offsets)
         elif cmd.DATA_STREAMING:
-            datum = list(unpack('<L3f3h2HB4H', data))
-            print datum[6:]
+            if (len(data) == 35):
+              datum = list(unpack('<L3f3h2HB4H', data))
+              print datum[6:]
+
 
     def echo(self):
         '''
@@ -138,9 +140,10 @@ class DynaRoach():
       self.radio.send(cmd.STATUS_UNUSED, cmd.DATA_STREAMING, data)
       time.sleep(0.5)
 
-    def reset(self):
+    def reset(self, do_wait=True):
       self.radio.send(cmd.STATUS_UNUSED, cmd.RESET, [])
-      time.sleep(11)
+      if do_wait:
+        time.sleep(11)
     
     def configure_trial(self, trial):
         '''

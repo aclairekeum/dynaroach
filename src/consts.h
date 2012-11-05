@@ -45,6 +45,7 @@
 #define CMD_GET_SAMPLE_COUNT        0x09
 #define CMD_RUN_GYRO_CALIB          0x0A
 #define CMD_GET_GYRO_CALIB_PARAM    0x0B
+#define CMD_TEST_SWEEP              0x0C
 
 #define TEST_PACKET_INTERVAL_MS 1000
 #define NUM_TEST_PACKETS        10
