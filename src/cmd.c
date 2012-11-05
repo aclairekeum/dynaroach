@@ -71,6 +71,7 @@ static void cmdTestDflash(unsigned char status, unsigned char length, unsigned c
 static void cmdEraseMemSector(unsigned char status, unsigned char length, unsigned char *frame);
 static void cmdTestHall(unsigned char status, unsigned char length, unsigned char* frame);
 static void cmdTestBatt(unsigned char status, unsigned char length, unsigned char* frame);
+static void cmdTestSweep(unsigned char status, unsigned char length, unsigned char* frame);
 static void cmdGetSampleCount(unsigned char status, unsigned char length, unsigned char *frame);
 static void cmdRunGyroCalib(unsigned char status, unsigned char length, unsigned char *frame);
 static void cmdGetGyroCalibParam(unsigned char status, unsigned char length, unsigned char *frame);
@@ -116,7 +117,7 @@ void cmdSetup(void)
     cmd_func[CMD_SET_STREAMING] = &cmdSetDataStreaming;
     cmd_func[CMD_SET_MOTOR_CONFIG] = &cmdSetMotorConfig;
     cmd_func[CMD_RESET] = &cmdReset;
-
+    cmd_func[CMD_TEST_SWEEP] = &cmdTestSweep;
     MotorConfig.rising_edge_duty_cycle = 0;
     MotorConfig.falling_edge_duty_cycle = 0;
 }
@@ -128,7 +129,6 @@ static void cmdSetMotor(unsigned char status, unsigned char length, unsigned cha
 
 static void cmdSetMotorConfig(unsigned char status, unsigned char length, unsigned char *frame)
 {
-  int i;
   intT rising_duty;
   intT falling_duty;
   rising_duty.c[0] = frame[0];
@@ -498,6 +498,24 @@ static void cmdTestDflash(unsigned char status, unsigned char length, unsigned c
 
 }
 
+static int do_sweep = 0;
+static float sweep_start_speed = 0;
+static float sweep_stop_speed = 0;
+static void cmdTestSweep(unsigned char status, unsigned char length, unsigned char* frame)
+{
+  intT temp;
+  temp.c[0] = frame[0];
+  temp.c[1] = frame[1];
+  sweep_start_speed = temp.i/1000.f;
+  temp.c[0] = frame[2];
+  temp.c[1] = frame[3];
+  sweep_stop_speed = temp.i/1000.f;
+  do_sweep = 1;
+  //sweep_start_speed = 15;
+  //sweep_stop_speed = 40;
+  MD_LED_2 = ~MD_LED_2;
+}
+
 static void cmdEraseMemSector(unsigned char status, unsigned char length, unsigned char *frame)
 {
     uByte2 page;
@@ -679,6 +697,14 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt(void)
             }
         }
 
+        if (do_sweep == 1)
+        {
+          do_sweep = 0;
+          MotorConfig.rising_edge_duty_cycle = 0.0f;
+          MotorConfig.falling_edge_duty_cycle = 0.0f;
+
+        }
+
         cmd_func[st->cmd](STATUS_UNUSED, 2, st->params);
         st_idx++;
         if (st_idx == st_cnt)
@@ -707,6 +733,20 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt(void)
         {
             st = stTable[st_idx];
         }
+    }
+
+    //Increment motor speeds for sweep
+    if (do_sweep)
+    {
+      float dt = (t_ticks.lval - stTable[st_idx-1]->timestamp);
+      float percent = dt/(stTable[st_idx]->timestamp - stTable[st_idx-1]->timestamp);
+
+      float motor = sweep_stop_speed*(percent)+sweep_start_speed*(1-percent);
+      //if (motor < 30 && motor > -30) {
+        MotorConfig.falling_edge_duty_cycle = motor;
+        MotorConfig.rising_edge_duty_cycle = motor;
+        mcSetDutyCycle(1, motor);
+      //}
     }
 
     if (saveData2Flash == 1)
@@ -754,13 +794,11 @@ void sendCurrentSensors() {
     uByte4 t_ticks, yaw, pitch, roll;
     uByte2 bemf, v_batt;
     unsigned char hall_state = 0;
-
+    unsigned int i = 0;
     unsigned char* xlXYZ;
     unsigned char kDataLength = 35;
     unsigned char buffer[kDataLength];
-    static unsigned char buf_idx = 1;
     StateTransition st;
-    int i;
 
     //Get pose estimates
     if(attIsRunning())
@@ -843,7 +881,7 @@ void __attribute__((interrupt, no_auto_psv)) _T2Interrupt(void)
   short hall = PORTBbits.RB7;
   if (prevHall != 0 && 0 == hall) {
     motor_falling_edge();
-  } else if(0 == prevHall & hall != 0) {
+  } else if(0 == prevHall && hall != 0) {
     motor_rising_edge();
   }
   prevHall = hall;
