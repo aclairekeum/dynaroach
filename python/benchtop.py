@@ -115,10 +115,10 @@ def doHardwareSweep(motor_speed_min, motor_speed_max, time_run, outdir, robot):
   robot.configure_trial(trial)
   time.sleep(0.5)
   robot.run_trial()
-  time.sleep(6)
+  time.sleep(time_run/1000.0+2)
   robot.transmit_saved_data()
   time.sleep(8)
-  robot.save_trial_data('./'+ outdir + '/' + str(motor_speed) + '_mcu.csv')
+  robot.save_trial_data('./'+ outdir + '/ramp_mcu.csv')
   time.sleep(9)
 
 def main():
