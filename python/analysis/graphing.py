@@ -4,6 +4,8 @@ import numpy
 import math
 import glob
 import scipy.fftpack
+import math
+import pdb
 
 #column titles
 TIME = 0;
@@ -16,8 +18,20 @@ ACCEL_Z = 6
 BACK_EMF = 7
 EMPTY_1 = 8
 EMPTY_2 = 9
-HALL = 10
-BATTERY_V = 11
+HALL = 9
+BATTERY_V = 10
+POWER = 14
+
+#power generation constants
+ADC_MAX = 1023.0
+Kt = 0.00683
+Ke = 0.15
+OFFSET = 0.152
+R_MOTOR = 4.2
+COMP_GAIN = 0.8 # << IS this possible????
+#CHECK 2 RESISTORS GAIN COULD BE 1
+COMP_GAIN = 1.0
+#COMP_GAIN = 0.9 # << IS this possible????
 
 names = ["Time", "Gyro_x", "Gyro_y", "Gyro_z", "Accel_x",\
     "Accel_y", "Accel_z", "Back_emf", "Empty_1", "Empty_2", "Hall", "Battery_V"]
@@ -88,18 +102,51 @@ def reasonableData(data, line):
   length = len(data)
   return data[length-1][TIME] < line[TIME]
 
+def getPower(v_batt_raw, back_emf):
+  #ref_emf = (d[0,1], ADC_MAX)[d[0,1] > ADC_MAX]
+  #v_ref = ref_emf / ADC_MAX * v_batt
+  v_batt = v_batt_raw / ADC_MAX * 2 * 3.3
+
+  v_back_emf = ((back_emf) / ADC_MAX) * 3.3 / COMP_GAIN
+  v_batt = 3.67
+  #pdb.set_trace()
+  i = (v_batt - v_back_emf) / R_MOTOR
+  #i[i< 0] = 0
+  omega = (v_back_emf / Ke) * 2 * math.pi
+  power = Kt * i * omega
+  #return v_batt
+  #return v_batt - v_back_emf
+
+  return power
+
 def parseData(filename):
   data = []
   f = open(filename)
   f.readline() #ignore the first data
   for line in f:
     temp = [float(x) for x in line.strip().split(',')]
+    temp.append(getPower(temp[BATTERY_V], temp[BACK_EMF]))
     if reasonableData(data, temp):
       data.append(temp)
-  
+    
   dataArray = numpy.array(data);
   dataArray[:, 0] = dataArray[:, 0]/(625)
   return dataArray
+
+def hallFrequencyEstimation(filename):
+  dataArray = parseData(filename)
+  state = 0
+  frequency = []
+  lastSwitchTime = 0
+  lastFreq = 0
+  for data in dataArray:
+    if data[HALL] == 0 and state == 1:
+      lastFreq = 1000.0/(data[TIME]-lastSwitchTime);
+      lastSwitchTime = data[TIME]
+    frequency.append(lastFreq)
+    state = data[HALL]
+  return frequency
+
 
 def makeGraphsOf(filename):
   toPlot = [1, 2, 3, 4, 5, 6, 7, 10, 11]
@@ -154,12 +201,42 @@ def main():
   
   #for filename in files:
   #  makeGraphsOf(filename)
-  colors = [(.4, .4, .8), (.2, .8, .3)]
-  colors2 = [(.2, .2, .6), (.0, .6, .1)]
+  colors = [(.4, .4, .8), (.2, .8, .3), (.8, .8, .3),(.8, .3, .8)]
+  colors2 = [(.2, .2, .6), (.0, .6, .1),(.6, .6, .1), (.6, .1, .6)]
   
   # colors = [(.8, .8,.6), (.8, .6, .8 )]
   # colors2= [(.5, .5, .2), (.5, .2, .5)]
+
+  names = []
+  for filename in files:
+    names.append(filename.split('_')[0].split("/")[-1]);
   
+  count = 0
+  for filename in files:
+    frequency = hallFrequencyEstimation(filename)
+    pyplot.plot(frequency, '-', color=colors[count])
+    count += 1
+  pyplot.show()
+  pyplot.legend(names*2)
+  pyplot.title("Robot Comparison of Frequency")
+  pyplot.xlabel("Motor Speed (%)")
+  pyplot.ylabel("Frequency (Hertz)")
+  exit(1)
+
+  count = 0
+  for filename in files:
+    graphMulti(filename, POWER, colors[count])
+    count +=1
+
+  count = 0
+  for filename in files:
+    graphBlurred(filename, POWER, colors2[count])
+    count +=1
+  pyplot.legend(names*2)
+  pyplot.title("Robot Comparison for Power")
+  pyplot.xlabel("Motor Speed (%)")
+  pyplot.ylabel("Power (W)")
+  pyplot.figure()
   count = 0
   for filename in files:
     graphMulti(filename, BACK_EMF, colors[count])
@@ -172,7 +249,7 @@ def main():
   pyplot.title("Robot Comparison")
   pyplot.xlabel("Motor Speed (%)")
   pyplot.ylabel("BackEMF")
-  pyplot.legend(["Luke's robot", "Aaron's Robot"]*2)
+  pyplot.legend(names*2)
   
   pyplot.figure()
   count = 0
@@ -182,7 +259,7 @@ def main():
   pyplot.title("Robot Comparison")
   pyplot.xlabel("Motor Speed (%)")
   pyplot.ylabel("BackEMF")
-  pyplot.legend(["Luke's robot", "Aaron's Robot"]*2)
+  pyplot.legend(names*2)
   
   pyplot.figure()
   
@@ -198,24 +275,8 @@ def main():
   pyplot.title("Robot Comparison")
   pyplot.xlabel("Motor Speed (%)")
   pyplot.ylabel("Squared Error in BackEMF")
-  pyplot.legend(["Luke's robot 200 smooth", "Aaron's Robot 200 smooth",
-    "Luke's robot 50 smooth", "Aaron's Robot 50 smooth"])
+  pyplot.legend(names*2)
   
-  count = 0
-  #for filename in files:
-  pyplot.figure()
-  graphMulti(files[0], BACK_EMF, colors[0], '-')
-  pyplot.title("Luke's Robot")
-  pyplot.xlabel("Motor Speed (%)")
-  pyplot.ylabel("BackEMF")
-  pyplot.axis([10, 65, 880, 1000])
-  
-  pyplot.figure()
-  graphMulti(files[1], BACK_EMF, colors[1], '-')
-  pyplot.title("Aaron's Robot")
-  pyplot.xlabel("Motor Speed (%)")
-  pyplot.ylabel("BackEMF")
-  pyplot.axis([10, 65, 880, 1000])
   pyplot.show()
 
 if __name__ == "__main__":
