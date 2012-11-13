@@ -147,6 +147,54 @@ def hallFrequencyEstimation(filename):
     state = data[HALL]
   return frequency
 
+def backEMFFrequencyEstimation(filename):
+  dataArray = parseData(filename)
+  window = 200;
+  length = len(dataArray[:,0])
+  n = length
+  
+  print filename
+  delta = length/n
+  frequency = []
+  timestep = (dataArray[-1,TIME] - dataArray[0,TIME] )/ float(length)
+  
+  for i in range(n):
+    mi = max(0, i*delta-window)
+    ma = min(length, i*delta+window)
+    # if (i%100 == 0):
+    #   pyplot.plot(dataArray[mi:ma,BACK_EMF])
+    #   pyplot.show()
+    fft = scipy.fftpack.rfft(smooth(dataArray[mi:ma,BACK_EMF], 4))
+    fftoffset = 10
+    fft = fft[fftoffset:-1]
+    # if (i%100 == 0):
+    #   pyplot.semilogx(numpy.abs(fft))
+    #   pyplot.show()
+    indx = list(fft).index(max(fft))+fftoffset
+    
+    freqLookup = scipy.fftpack.fftfreq(ma-mi, d = timestep)
+    frequency.extend([freqLookup[indx]*1000]*delta)
+  return smooth(numpy.array(frequency), 30)
+
+
+
+# def backEMFFrequencyEstimation(filename):
+#   lastFreq = 0
+#   dataArray = parseData(filename)
+#   frequency = []
+#   smoo = smooth(dataArray[:, BACK_EMF], 5)
+#   lastSwitchTime = 0
+#   state = 0
+#   for i in range(len(dataArray[:, BACK_EMF])):
+#     tempstate = dataArray[i, BACK_EMF]-smoo[i] > 1
+#     if tempstate < 1 and state == 1:
+#       lastFreq = 1000.0/(dataArray[i, TIME] - lastSwitchTime)
+#       lastSwitchTime = dataArray[i, TIME]
+#     frequency.append(lastFreq)
+#     state = tempstate
+
+#   return smooth(numpy.array(frequency), 40)
+
 
 def makeGraphsOf(filename):
   toPlot = [1, 2, 3, 4, 5, 6, 7, 10, 11]
@@ -160,6 +208,7 @@ def makeGraphsOf(filename):
     #pyplot.plot(dataArray[:,0], dataArray[:,plotType])
     pyplot.plot(numpy.linspace(14,60,len(dataArray[:,0])), dataArray[:,plotType])
     pyplot.savefig(filename+"_"+names[plotType]+".png");
+
 
 def getFft(filename, plotType):
   dataArray = parseData(filename)
@@ -176,7 +225,7 @@ def graphMulti(filename, plotType, color, plot_format='.'):
 
 def graphBlurred(filename, plotType, color):
   dataArray = parseData(filename) 
-  smoothed = smooth(dataArray[:,plotType],window_len=60)
+  smoothed = smooth(dataArray[:,plotType],window_len=40)
   pyplot.plot(numpy.linspace(14, 60, len(dataArray[:,0])), smoothed[0:len(dataArray[:,0])], '-', linewidth=2, color=color )
   #pyplot.plot(dataArray[:,0], smoothed[0:len(dataArray[:,0])], '-', linewidth=2, color=color )
 
@@ -207,21 +256,37 @@ def main():
   # colors = [(.8, .8,.6), (.8, .6, .8 )]
   # colors2= [(.5, .5, .2), (.5, .2, .5)]
 
+  # dataArray = parseData(files[2])
+  # pyplot.plot(dataArray[:, BACK_EMF])
+
   names = []
   for filename in files:
     names.append(filename.split('_')[0].split("/")[-1]);
   
   count = 0
   for filename in files:
+    frequency = backEMFFrequencyEstimation(filename)
+    pyplot.plot(frequency, '-', color=colors[count])
+    count += 1
+
+  count = 0
+  for filename in files:
     frequency = hallFrequencyEstimation(filename)
     pyplot.plot(frequency, '-', color=colors[count])
     count += 1
-  pyplot.show()
+
+
   pyplot.legend(names*2)
-  pyplot.title("Robot Comparison of Frequency")
+  pyplot.title("Robot Comparison of Frequency with Hall and BackEMF")
   pyplot.xlabel("Motor Speed (%)")
   pyplot.ylabel("Frequency (Hertz)")
-  exit(1)
+  #pyplot.show()
+  #exit(1)
+  #pyplot.show()
+  #exit(1)
+  
+  pyplot.figure()
+  #exit(1)
 
   count = 0
   for filename in files:
