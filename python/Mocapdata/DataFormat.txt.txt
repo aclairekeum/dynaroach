@@ -1,0 +1,2 @@
+Time, X, Y, Z, qw, qx, qy, qz
+	  Position  Quaternion
