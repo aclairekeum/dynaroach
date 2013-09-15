@@ -130,8 +130,13 @@ class DynaRoach():
         time.sleep(0.5)
 
     def set_motor_config(self, rising_duty_cycle, falling_duty_cycle):
-      cmd_data = str(pack('h', int(rising_duty_cycle*100))); 
-      cmd_data += str(pack('h', int(falling_duty_cycle*100))); 
+      '''
+      Set the motor config for rising and falling strides.
+      Rising_duty_cycle and falling_duty_cycle are floats from 0-1
+      '''
+      max_int = 2**15;
+      cmd_data = str(pack('h', int(max_int * rising_duty_cycle)))
+      cmd_data += str(pack('h', int(max_int * falling_duty_cycle)))
       self.radio.send(cmd.STATUS_UNUSED, cmd.MOTOR_CONFIG, cmd_data)
       time.sleep(0.5)
 

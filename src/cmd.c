@@ -18,6 +18,7 @@
 #include "adc.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 #define FLASH_8MBIT_BYTES_PER_PAGE          264
 
@@ -33,7 +34,6 @@ static union {
     unsigned char chr_index[4];
 } MemLoc;
 
-#define MOTOR_CONFIG_LENGTH (2*sizeof(float))
 static struct {
   float rising_edge_duty_cycle;
   float falling_edge_duty_cycle;
@@ -136,8 +136,9 @@ static void cmdSetMotorConfig(unsigned char status, unsigned char length, unsign
   falling_duty.c[0] = frame[2];
   falling_duty.c[1] = frame[3];
 
-  MotorConfig.rising_edge_duty_cycle = rising_duty.i/100.0f;
-  MotorConfig.falling_edge_duty_cycle = falling_duty.i/100.0f;
+  //mcSetDutyCycle takes inputs of -100 to 100
+  MotorConfig.rising_edge_duty_cycle = ((float)rising_duty.i/INT_MAX)*100;
+  MotorConfig.falling_edge_duty_cycle = ((float)falling_duty.i/INT_MAX)*100;
 
   LED_2 = ~LED_2;
   LED_1 = ~LED_1;
