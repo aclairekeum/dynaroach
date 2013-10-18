@@ -20,6 +20,7 @@
 #include <string.h>
 #include <stdint.h>
 
+
 #define FLASH_8MBIT_BYTES_PER_PAGE          264
 
 
@@ -75,7 +76,6 @@ static void cmdTestSweep(unsigned char status, unsigned char length, unsigned ch
 static void cmdGetSampleCount(unsigned char status, unsigned char length, unsigned char *frame);
 static void cmdRunGyroCalib(unsigned char status, unsigned char length, unsigned char *frame);
 static void cmdGetGyroCalibParam(unsigned char status, unsigned char length, unsigned char *frame);
-static void cmdConfigureSettings(unsigned char status, unsigned char length, unsigned char *frame);
 static void cmdSetDataStreaming(unsigned char status, unsigned char length, unsigned char *frame);
 static void cmdSetMotorConfig(unsigned char status, unsigned char length, unsigned char *frame);
 static void cmdReset(unsigned char status, unsigned char length, unsigned char *frame);
@@ -113,7 +113,6 @@ void cmdSetup(void)
     cmd_func[CMD_GET_SAMPLE_COUNT] = &cmdGetSampleCount;
     cmd_func[CMD_RUN_GYRO_CALIB] = &cmdRunGyroCalib;
     cmd_func[CMD_GET_GYRO_CALIB_PARAM] = &cmdGetGyroCalibParam;
-    cmd_func[CMD_CONFIGURE_SETTINGS] = &cmdConfigureSettings;
     cmd_func[CMD_SET_STREAMING] = &cmdSetDataStreaming;
     cmd_func[CMD_SET_MOTOR_CONFIG] = &cmdSetMotorConfig;
     cmd_func[CMD_RESET] = &cmdReset;
@@ -217,7 +216,7 @@ static void cmdTxSavedData(unsigned char status, unsigned char length, unsigned 
                     continue;
                 }
                 macSetDestPan(packet, NETWORK_BASESTATION_PAN_ID);
-                macSetDestAddr(packet, networkGetBaseStationAddr());
+                macSetDestAddr(packet, NETWORK_BASESTATION_ADDR);
                 pld = macGetPayload(packet);
                 dfmemRead(i, j, tx_data_size, payGetData(pld));
                 paySetType(pld, CMD_TX_SAVED_DATA);
@@ -225,7 +224,7 @@ static void cmdTxSavedData(unsigned char status, unsigned char length, unsigned 
                 {
                     radioProcess();
                 }
-                delay_ms(5);
+                delay_ms(20);
                 j += tx_data_size;
                 read++;
             }
@@ -538,34 +537,6 @@ static void cmdGetSampleCount(unsigned char status, unsigned char length, unsign
     }
 }
 
-static void cmdConfigureSettings(unsigned char status, unsigned char length, unsigned char *frame)
-{
-  int temp_page = MemLoc.index.page;
-  int temp_byte = MemLoc.index.byte;
-  unsigned char buffer[SETTINGS_SIZE];
-  static unsigned char buf_idx = 1;
-
-  MemLoc.index.page = MEM_CONFIG_PAGE;
-  MemLoc.index.byte = 0;
-
-  intT networkAddr;
-  networkAddr.c[0] = frame[0];
-  networkAddr.c[1] = frame[1];
-  buffer[0] = networkAddr.c[0];
-  buffer[1] = networkAddr.c[1];
-
-  networkSetBaseStationAddr(networkAddr.i);
-
-  dfmemWrite(buffer, SETTINGS_SIZE, MemLoc.index.page, MemLoc.index.byte, buf_idx);
-
-  LED_1 = ~LED_1;
-  delay_ms(100);
-  LED_1 = ~LED_1;
-
-  MemLoc.index.byte = temp_byte;
-  MemLoc.index.page = temp_page;
-}
-
 static void cmdSetDataStreaming(unsigned char status, unsigned char length, unsigned char *frame)
 {
     if (frame[0] == 0x00) {
@@ -598,7 +569,7 @@ static void send(unsigned char status, unsigned char length, unsigned char *fram
         return;
     }
     macSetDestPan(packet, NETWORK_BASESTATION_PAN_ID);
-    macSetDestAddr(packet, networkGetBaseStationAddr());
+    macSetDestAddr(packet, NETWORK_BASESTATION_ADDR);
     pld = macGetPayload(packet);
     paySetData(pld, length, frame);
     paySetType(pld, type);

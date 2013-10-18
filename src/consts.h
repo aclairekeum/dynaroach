@@ -70,5 +70,4 @@
 
 #define TIMER1_FCY          250
 
-#define SETTINGS_SIZE       2
 #endif
