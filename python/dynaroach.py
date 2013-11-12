@@ -115,20 +115,6 @@ class DynaRoach():
             print('\n')
             time.sleep(1)
 
-    def configure_settings(self, basestation_addr):
-        '''
-        Description:
-          This changges various persistent settings on the target.
-          Input is in the form of one hex strings.
-          Examples are "0x0110" or "0xabcd"
-        '''
-        basestation = int(basestation_addr, 16)
-        cmd_data =str(pack('B', basestation%256))
-        cmd_data+=str(pack('B', basestation/256)) 
-        print("sending data:" + str(cmd_data))
-        self.radio.send(cmd.STATUS_UNUSED, cmd.CONFIG_SETTINGS, cmd_data)
-        time.sleep(0.5)
-
     def set_motor_config(self, rising_duty_cycle, falling_duty_cycle):
       '''
       Set the motor config for rising and falling strides.
@@ -388,7 +374,25 @@ class Trial():
             for line in infile.readlines():
                 st = line.rstrip('\n').split(',')
                 print(st)
-                self.state_transitions.append(StateTransition(int(st[0]),\
+                if (int(st[1]) == cmd.MOTOR_CONFIG):
+                  m1 = float(st[2])
+                  m2 = float(st[3])
+                  fixed_max = (2**15 - 1)
+                  i1 = fixed_max * m1
+                  i2 = fixed_max * m2
+
+                  i1_0 = i1%256
+                  i1_1 = i1/256
+
+                  i2_0 = i2%256
+                  i2_1 = i2/256
+
+                  self.state_transitions.append(StateTransition(int(st[0]),\
+                                                              int(st[1]),\
+                                                              [i1_0,\
+                                                              i1_1, i2_0, i2_1]))
+                else:
+                  self.state_transitions.append(StateTransition(int(st[0]),\
                                                               int(st[1]),\
                                                               [int(st[2]),\
                                                               int(st[3])]))
