@@ -83,6 +83,8 @@ class DynaRoach():
             datum = list(unpack('<L3f3h2HB4H', data))
             self.state_data.append(datum)
             self.data_cnt += 1
+            if self.data_cnt % 100 == 0:
+                print self.data_cnt, "/", self.last_sample_count
         elif typeID == cmd.GET_SAMPLE_COUNT:
             self.last_sample_count = unpack('H', data)[0]
             print('Last sample count %d' % self.last_sample_count)
