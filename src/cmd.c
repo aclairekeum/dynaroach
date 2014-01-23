@@ -318,7 +318,7 @@ static void cmdRunTrial(unsigned char status, unsigned char length, unsigned cha
 {
     st_idx = 0;
     attSetEstimateRunning(1);
-    trial_start_time = sclockGetLocalTicks();
+    trial_start_time = sclockGetTicks();
     sample_cnt.sval = 0;
     _T1IE = 1;
 }
@@ -595,7 +595,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt(void)
 
     st = stTable[st_idx];
 
-    t_ticks.lval = sclockGetLocalTicks() - trial_start_time;
+    t_ticks.lval = sclockGetTicks() - trial_start_time;
     //Get pose estimates
     if(attIsRunning())
     {

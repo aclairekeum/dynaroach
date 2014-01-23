@@ -20,6 +20,8 @@ void stFree(StateTransition st)
 
 void stConfigure(StateTransition st, unsigned int timestamp, unsigned char cmd)
 {
-    st->timestamp = (long)timestamp * (long)sclockGetMillisFactor(); //Convert from ms to system clock ticks
+    //TODO don't hard code this here
+    long millisFactor = 625;
+    st->timestamp = (long)timestamp * millisFactor; //Convert from ms to system clock ticks
     st->cmd = cmd;
 }

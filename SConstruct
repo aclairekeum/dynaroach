@@ -1,6 +1,6 @@
 import os
 
-xcCompiler = "/opt/microchip/xc16/v1.11/"
+xcCompiler = "/opt/microchip/xc16/v1.20/"
 imageProc = "../imageproc-lib"
 
 assemblerFlags = "-Wa,-g" #pulled from makefile
@@ -26,8 +26,24 @@ list = Builder(action = 'xc16-objdump -S -D $SOURCE > $TARGET',
                src_suffix = 'elf')
 env.Append(BUILDERS = {'List' : list})
 
-imageProcLibFiles = Glob(imageProc+"/*.c")
-imageProcLibFiles += Glob(imageProc+"/*.s")
+imageProcLibFiles = [imageProc + "/" + n for n in [ 
+    "dfmem.c",
+    "gyro.c",
+    "i2c_driver.c",
+    "payload.c",
+    "radio.c",
+    "sclock.c",
+    "delay.s",
+    "libqw.c",
+    "xl.c",
+    "ppool.c",
+    "spi_controller.c",
+    "div16.s",
+    "udiv16.s",
+    "init_default.c",
+    "carray.c",
+    "mac_packet.c",
+    "at86rf231_driver.c"]]
 dynaroachFiles = Glob("src/*.c")
 staticLibs = [xcCompiler + "/lib/dsPIC33F/libp33FJ128MC706-elf.a", xcCompiler + "/lib/libq-elf.a"]
 

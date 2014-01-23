@@ -84,7 +84,8 @@ int main ( void )
     SwitchClocks();
     SetupPorts();
 
-    spicSetup();
+    spicSetupChannel1();
+    spicSetupChannel2();
     ppoolInit();
 
     //BEGIN RADIO SETUP
