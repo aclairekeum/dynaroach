@@ -93,9 +93,11 @@ void cmdSetup(void)
 
     for(i = 0; i < MAX_CMD_FUNC_SIZE; ++i)
     {
-        cmd_func[i] = &cmdNop;
+        cmd_func[i] = &cmdNop;// assign all array element to be a pointer pointer
     }
-
+//cmd_func = array []= indices 
+//function pointer array
+//define somewhere cmdtoggleled => logic 
     cmd_func[CMD_TX_SAVED_DATA] = &cmdTxSavedData;
     cmd_func[CMD_ECHO] = &cmdEcho;
     cmd_func[CMD_CONFIGURE_TRIAL] = &cmdConfigureTrial;
@@ -128,10 +130,10 @@ static void cmdSetMotor(unsigned char status, unsigned char length, unsigned cha
 
 static void cmdSetMotorConfig(unsigned char status, unsigned char length, unsigned char *frame)
 {
-  intT rising_duty;
+  intT rising_duty;//union => let you access in integer or byte
   intT falling_duty;
-  rising_duty.c[0] = frame[0];
-  rising_duty.c[1] = frame[1];
+  rising_duty.c[0] = frame[0];//LSB
+  rising_duty.c[1] = frame[1];//MSB
   falling_duty.c[0] = frame[2];
   falling_duty.c[1] = frame[3];
 
@@ -177,7 +179,8 @@ void cmdHandleRadioRxBuffer(void)
         pld = macGetPayload(packet);
         status = payGetStatus(pld);
         command = payGetType(pld);
-        if(command < MAX_CMD_FUNC_SIZE)
+        if(command < MAX_CMD_FUNC_SIZE)//error checking 
+        //within the boundary
         {
             cmd_func[command](status, payGetDataLength(pld), payGetData(pld));
         }
@@ -555,7 +558,7 @@ static void cmdReset(unsigned char status, unsigned char length, unsigned char *
 
 static void cmdNop(unsigned char status, unsigned char length, unsigned char *frame)
 {
-    Nop();
+    Nop();//do nothing
 }
 
 static void send(unsigned char status, unsigned char length, unsigned char *frame, unsigned char type)
