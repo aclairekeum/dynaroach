@@ -180,6 +180,7 @@ class DynaRoach():
     def get_gyro_calib_param(self):
         print("Requesting gyro calibration parameters...")
         self.radio.send(cmd.STATUS_UNUSED, cmd.GET_GYRO_CALIB_PARAM, [])
+        self.gyro_offsets = None
 
     def test_gyro(self):
         '''
