@@ -19,6 +19,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include "cam.h"
+#include "ovcam.h"
+
 
 
 #define FLASH_8MBIT_BYTES_PER_PAGE          264
@@ -79,6 +82,8 @@ static void cmdGetGyroCalibParam(unsigned char status, unsigned char length, uns
 static void cmdSetDataStreaming(unsigned char status, unsigned char length, unsigned char *frame);
 static void cmdSetMotorConfig(unsigned char status, unsigned char length, unsigned char *frame);
 static void cmdReset(unsigned char status, unsigned char length, unsigned char *frame);
+static void cmdTestLED(unsigned char status, unsigned char length, unsigned char* frame);
+static void cmdTestDynaCam(unsigned char status, unsigned char length, unsigned char* frame);
 static void send(unsigned char status, unsigned char length, unsigned char *frame, unsigned char type);
 
 //Delete these once trackable management code is working
@@ -119,8 +124,21 @@ void cmdSetup(void)
     cmd_func[CMD_SET_MOTOR_CONFIG] = &cmdSetMotorConfig;
     cmd_func[CMD_RESET] = &cmdReset;
     cmd_func[CMD_TEST_SWEEP] = &cmdTestSweep;
+    cmd_func[CMD_TEST_LED] = &cmdTestLED;
+    cmd_func[CMD_TEST_DYNACAM]= &cmdTestDynaCam;
     MotorConfig.rising_edge_duty_cycle = 0;
     MotorConfig.falling_edge_duty_cycle = 0;
+}
+
+static void cmdTestLED(unsigned char status, unsigned char length, unsigned char *frame)
+{LED_1= ~LED_1;
+}
+
+static void cmdTestDynaCam (unsigned char status, unsigned char length, unsigned char *frame)
+{
+    
+    
+    
 }
 
 static void cmdSetMotor(unsigned char status, unsigned char length, unsigned char *frame)
