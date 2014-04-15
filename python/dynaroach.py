@@ -21,7 +21,7 @@ from lib.basestation import BaseStation
 from lib.payload import Payload
 
 DEFAULT_BAUD_RATE = 230400
-DEFAULT_DEST_ADDR = '\x01\x10'
+DEFAULT_DEST_ADDR = '\x10\x00'
 DEFAULT_DEV_NAME = '/dev/tty.usbserial-A8THYF0S' #Dev ID for ORANGE antenna base station
 
 SMA_RIGHT = 0
@@ -66,12 +66,18 @@ class DynaRoach():
         self.last_sample_count = 0
 
         self.radio = BaseStation(dev_name, baud_rate, dest_addr, self.receive)
+        self.receive_callback = []
+
+    def add_receive_callback(self, callback):
+        self.receive_callback.append(callback)
 
     def receive(self, packet):
         self.last_packet = packet
         pld = Payload(packet.get('rf_data'))
         typeID = pld.type
         data = pld.data
+        for callback in self.receive_callback:
+            callback(pld)
 
         if typeID == cmd.TEST_ACCEL or typeID == cmd.TEST_GYRO:
             print unpack('<3h', data)
