@@ -40,7 +40,7 @@ BEMF_VOLTS_PER_CNT  = 3.3/512
 VBATT_VOLTS_PER_CNT = 3.3/512
 
 
-class DynaRoach():
+class DynaRoach(object):
     '''Class representing the dynaRoACH robot'''
 
     def __init__(self, dev_name=DEFAULT_DEV_NAME, baud_rate=DEFAULT_BAUD_RATE, dest_addr=DEFAULT_DEST_ADDR):
@@ -100,7 +100,7 @@ class DynaRoach():
         elif cmd.DATA_STREAMING:
             if (len(data) == 35):
               datum = list(unpack('<L3f3h2HB4H', data))
-              print datum[6:]
+              # print datum[6:]
 
 
     def echo(self):
