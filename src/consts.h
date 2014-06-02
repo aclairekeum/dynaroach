@@ -46,6 +46,8 @@
 #define CMD_RUN_GYRO_CALIB          0x0A
 #define CMD_GET_GYRO_CALIB_PARAM    0x0B
 #define CMD_TEST_SWEEP              0x0C
+#define CMD_TEST_LED                0x0D
+#define CMD_RUN_CAM			    	0X0E
 
 #define TEST_PACKET_INTERVAL_MS 1000
 #define NUM_TEST_PACKETS        10

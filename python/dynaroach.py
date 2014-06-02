@@ -9,6 +9,10 @@ running the dynaRoACH robot.
 import sys
 import time
 import math
+import os
+import io
+from PIL import Image
+from array import array
 
 from serial import Serial, SerialException
 import numpy as np
@@ -21,8 +25,8 @@ from lib.basestation import BaseStation
 from lib.payload import Payload
 
 DEFAULT_BAUD_RATE = 230400
-DEFAULT_DEST_ADDR = '\x01\x10'
-DEFAULT_DEV_NAME = '/dev/tty.usbserial-A8THYF0S' #Dev ID for ORANGE antenna base station
+DEFAULT_DEST_ADDR = '\x00\x15'
+DEFAULT_DEV_NAME = '/dev/ttyUSB0'   #/dev/tty.usbserial-A8THYF0S' '''#Dev ID for ORANGE antenna base station
 
 SMA_RIGHT = 0
 SMA_LEFT =  1
@@ -77,12 +81,17 @@ class DynaRoach():
             print unpack('<3h', data)
         elif typeID == cmd.TEST_DFLASH:
             print ''.join(data)
+        elif typeID == cmd.CMD_RUN_CAM:
+            camint = unpack('>i',data)
+            print camint
         elif typeID == cmd.TEST_BATT:
             print unpack('2H', data)
         elif typeID == cmd.TX_SAVED_DATA:
             datum = list(unpack('<L3f3h2HB4H', data))
             self.state_data.append(datum)
             self.data_cnt += 1
+            if self.data_cnt % 100 == 0:
+                print self.data_cnt, "/", self.last_sample_count
         elif typeID == cmd.GET_SAMPLE_COUNT:
             self.last_sample_count = unpack('H', data)[0]
             print('Last sample count %d' % self.last_sample_count)
@@ -93,8 +102,37 @@ class DynaRoach():
             if (len(data) == 35):
               datum = list(unpack('<L3f3h2HB4H', data))
               print datum[6:]
+              
+    def readimage(path):
+        count= os.stat(path).st_size/2
+        
+        with open(path,"rb") as f:
+            return bytearray(f.read())
+        bytes= readimage(path+extension)
+        image= Image.open(io.BytesIO(bytes))
+        image.save(savepath)
 
+    
+    def test_LED(self):
+        self.radio.send(cmd.STATUS_UNUSED, cmd.CMD_TEST_LED, [])
+        
+    def test_dynacam(self):
+        #todo: find a way to control timing.
+        Rows= 120
+        Columns= 160
+        imagearray= np.zeros((Rows, Columns,3), dtype= np.uint8)
+        #outputarray= np.zeros((120,160))
+        #Native Rows = 120 Native Columns= 160
+        print ('testing DynaCam')
+        self.radio.send(cmd.STATUS_UNUSED, cmd.CMD_RUN_CAM, [])
+        self.print_packet(self.last_packet)
+        data = self.last_packet('rf_data')
+        for i in range(0,Rows):
+            for j in range(0, Columns):
+                imagearray [i][j] = data[j]
+        
 
+        
     def echo(self):
         '''
         Description:
@@ -178,6 +216,7 @@ class DynaRoach():
     def get_gyro_calib_param(self):
         print("Requesting gyro calibration parameters...")
         self.radio.send(cmd.STATUS_UNUSED, cmd.GET_GYRO_CALIB_PARAM, [])
+        self.gyro_offsets = None
 
     def test_gyro(self):
         '''
@@ -206,6 +245,7 @@ class DynaRoach():
 
         print("Testing data flash...")
         self.radio.send(cmd.STATUS_UNUSED, cmd.TEST_DFLASH, [])
+
 
 #    def test_motor(self, motor_id, time, duty_cycle, direction, return_emf=0):
 #        '''

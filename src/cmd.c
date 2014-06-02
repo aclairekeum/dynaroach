@@ -19,8 +19,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-
-
+#include "cam.h"
+#include "ovcam.h"
 #define FLASH_8MBIT_BYTES_PER_PAGE          264
 
 
@@ -79,6 +79,8 @@ static void cmdGetGyroCalibParam(unsigned char status, unsigned char length, uns
 static void cmdSetDataStreaming(unsigned char status, unsigned char length, unsigned char *frame);
 static void cmdSetMotorConfig(unsigned char status, unsigned char length, unsigned char *frame);
 static void cmdReset(unsigned char status, unsigned char length, unsigned char *frame);
+static void cmdTestLED(unsigned char status, unsigned char length, unsigned char* frame);
+static void cmdRunCam(unsigned char status, unsigned char length, unsigned char* frame);
 static void send(unsigned char status, unsigned char length, unsigned char *frame, unsigned char type);
 
 //Delete these once trackable management code is working
@@ -119,8 +121,44 @@ void cmdSetup(void)
     cmd_func[CMD_SET_MOTOR_CONFIG] = &cmdSetMotorConfig;
     cmd_func[CMD_RESET] = &cmdReset;
     cmd_func[CMD_TEST_SWEEP] = &cmdTestSweep;
+    cmd_func[CMD_TEST_LED] = &cmdTestLED;
+    cmd_func[CMD_RUN_CAM] = &cmdRunCam;
     MotorConfig.rising_edge_duty_cycle = 0;
     MotorConfig.falling_edge_duty_cycle = 0;
+}
+
+static void cmdTestLED(unsigned char status, unsigned char length, unsigned char *frame)
+{
+        LED_1= ~LED_1;
+}
+
+static void cmdRunCam(unsigned char status, unsigned char length, unsigned char *frame)
+{   camSetup();
+    LED_1 = 0;
+    camStart();
+
+    CamRow r; 
+    CamFrame F;
+    
+    unsigned int i;
+    unsigned char* pix;
+
+    LED_1 = 1;
+    
+    if(camHasNewFrame()) {
+        F = camGetFrame();
+        
+        for(i = 0; i < F->num_rows; i++) {
+            LED_1 = 0;
+            r = F-> rows[i];
+            pix = r -> pixels;
+            send(status, 160, pix, CMD_RUN_CAM);
+            LED_1 = 1;
+            delay_ms(150);
+            }
+        }
+    camStop();
+   //camReturnFrame(frame);
 }
 
 static void cmdSetMotor(unsigned char status, unsigned char length, unsigned char *frame)
@@ -321,7 +359,7 @@ static void cmdRunTrial(unsigned char status, unsigned char length, unsigned cha
 {
     st_idx = 0;
     attSetEstimateRunning(1);
-    trial_start_time = sclockGetLocalTicks();
+    trial_start_time = sclockGetTicks();
     sample_cnt.sval = 0;
     _T1IE = 1;
 }
@@ -598,7 +636,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt(void)
 
     st = stTable[st_idx];
 
-    t_ticks.lval = sclockGetLocalTicks() - trial_start_time;
+    t_ticks.lval = sclockGetTicks() - trial_start_time;
     //Get pose estimates
     if(attIsRunning())
     {
