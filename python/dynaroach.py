@@ -25,8 +25,13 @@ from lib.basestation import BaseStation
 from lib.payload import Payload
 
 DEFAULT_BAUD_RATE = 230400
+<<<<<<< HEAD
 DEFAULT_DEST_ADDR = '\x00\x15'
 DEFAULT_DEV_NAME = '/dev/ttyUSB0'   #/dev/tty.usbserial-A8THYF0S' '''#Dev ID for ORANGE antenna base station
+=======
+DEFAULT_DEST_ADDR = '\x10\x00'
+DEFAULT_DEV_NAME = '/dev/tty.usbserial-A8THYF0S' #Dev ID for ORANGE antenna base station
+>>>>>>> upstream/Cammode
 
 SMA_RIGHT = 0
 SMA_LEFT =  1
@@ -44,7 +49,7 @@ BEMF_VOLTS_PER_CNT  = 3.3/512
 VBATT_VOLTS_PER_CNT = 3.3/512
 
 
-class DynaRoach():
+class DynaRoach(object):
     '''Class representing the dynaRoACH robot'''
 
     def __init__(self, dev_name=DEFAULT_DEV_NAME, baud_rate=DEFAULT_BAUD_RATE, dest_addr=DEFAULT_DEST_ADDR):
@@ -70,12 +75,18 @@ class DynaRoach():
         self.last_sample_count = 0
 
         self.radio = BaseStation(dev_name, baud_rate, dest_addr, self.receive)
+        self.receive_callback = []
+
+    def add_receive_callback(self, callback):
+        self.receive_callback.append(callback)
 
     def receive(self, packet):
         self.last_packet = packet
         pld = Payload(packet.get('rf_data'))
         typeID = pld.type
         data = pld.data
+        for callback in self.receive_callback:
+            callback(pld)
 
         if typeID == cmd.TEST_ACCEL or typeID == cmd.TEST_GYRO:
             print unpack('<3h', data)
@@ -101,6 +112,7 @@ class DynaRoach():
         elif cmd.DATA_STREAMING:
             if (len(data) == 35):
               datum = list(unpack('<L3f3h2HB4H', data))
+<<<<<<< HEAD
               print datum[6:]
               
     def readimage(path):
@@ -111,6 +123,9 @@ class DynaRoach():
         bytes= readimage(path+extension)
         image= Image.open(io.BytesIO(bytes))
         image.save(savepath)
+=======
+              # print datum[6:]
+>>>>>>> upstream/Cammode
 
     
     def test_LED(self):
